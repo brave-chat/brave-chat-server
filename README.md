@@ -8,6 +8,27 @@ A fully async based backend for the [chat application](github.com/wiseaidev/chat
 - Pip
 - Poetry (Python Package Manager)
 
+## Mysql Config
+
+### 1. Configure mysql server on localhost
+
+For mysql:
+
+```sh
+$ sudo apt-get update
+$ sudo apt-get install mysql-server libmysqlclient-dev
+$ sudo mysql_secure_installation
+```
+
+### 2. Configure the root user credentials
+
+```sh
+$ mysql -u root
+> ALTER USER 'root'@'localhost' IDENTIFIED BY 'password';
+> FlUSH PRIVILEGES;
+> exit;
+```
+
 ## Installation
 
 ```sh
