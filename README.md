@@ -1,6 +1,6 @@
 # Chat App SingleStore Based Backend
 
-A fully async based backend for the [chat application](github.com/wiseaidev/chat) built using FastAPI, SingleStore with aiomysql, [databases](https://github.com/encode/databases), pydantic, SQLAlchemy, and Deta.
+A fully async based backend for the [chat application](https://github.com/wiseaidev/chat) built using FastAPI, SingleStore with aiomysql, [databases](https://github.com/encode/databases), pydantic, SQLAlchemy, and Deta.
 
 ## Development Requirements
 
