@@ -74,7 +74,7 @@ async def root():
 
 
 chat_app.include_router(auth_router.router, tags=["Auth"])
-# chat_app.include_router(users_router.router, tags=["User"])
+chat_app.include_router(users_router.router, tags=["User"])
 
 
 def serve() -> None:

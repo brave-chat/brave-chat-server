@@ -1,6 +1,8 @@
 from fastapi.encoders import jsonable_encoder
 import datetime
 
+# SingleSore bug: https://github.com/sqlalchemy/sqlalchemy/discussions/8650
+# from app.auth.model import AccessTokens, BlackListedTokens
 from app.auth.schemas import UserCreate, UserLoginSchema
 from app.users.schemas import UserObjectSchema
 from app.utils.constants import ACCESS_TOKEN_EXPIRE_MINUTES
@@ -49,20 +51,21 @@ async def get_users_with_black_listed_token(token: str):
           *
         FROM
           black_listed_tokens
-          INNER JOIN access_tokens ON black_listed_tokens.id = access_tokens.id
-        where
-          access_tokens.token =: token
+        INNER JOIN access_tokens
+          ON black_listed_tokens.token = access_tokens.id
+        WHERE
+          access_tokens.token = :token
     """
     values = {"token": token}
     return await database.fetch_one(query, values=values)
 
 
 async def login_user(form_data):
-    user = await find_existed_user(form_data.username)
-    if not user:
+    user_obj = await find_existed_user(form_data.username)
+    if not user_obj:
         return {"status_code": 400, "message": "User not found!"}
 
-    user = UserLoginSchema(email=user.email, password=user.password)
+    user = UserLoginSchema(email=user_obj.email, password=user_obj.password)
     is_valid = verify_password(form_data.password, user.password)
     if not is_valid:
         return {"status_code": 401, "message": "Invalid Credentials!"}
@@ -72,7 +75,27 @@ async def login_user(form_data):
         data={"sub": form_data.username},
         expires_delta=access_token_expires,
     )
-    print(access_token)
+    # save access_token
+    query = """
+        INSERT INTO 
+            access_tokens (
+                user,
+                token,
+                creation_date
+            )
+        VALUES
+            (
+                :user,
+                :token,
+                :creation_date
+            )
+    """
+    values = {
+        "user": user_obj.id,
+        "token": access_token["access_token"],
+        "creation_date": datetime.datetime.utcnow()
+    }
+    await database.execute(query, values=values)
     return access_token
 
 
@@ -86,7 +109,6 @@ async def register_user(user):
     user.password = get_password_hash(user.password)
     await create_user(user)
     user = await find_existed_user(user.email)
-    print(user)
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = await create_access_token(
         data={"sub": user.email},
