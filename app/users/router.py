@@ -34,11 +34,12 @@ async def update_personal_information(
     personal_info: PersonalInfo,
     currentUser: UserObjectSchema = Depends(jwt_util.get_current_active_user),
 ):
+    currentUser = UserObjectSchema(**jsonable_encoder(currentUser))
     currentUser.first_name = personal_info.first_name
     currentUser.last_name = personal_info.last_name
     currentUser.bio = personal_info.bio
     currentUser.phone_number = personal_info.phone_number
-    await currentUser.save()
+    await user_crud.update_user_info(currentUser)
     return {
         "status_code": 200,
         "message": "Your personal information has been updated successfully!",
@@ -50,8 +51,7 @@ async def logout(
     token: str = Depends(jwt_util.get_token_user),
     currentUser: Users = Depends(jwt_util.get_current_active_user),
 ):
-    print(currentUser)
-    await user_crud.set_black_list(currentUser.id, token)
+    await user_crud.set_black_list(token)
     return {"status": 200, "message": "Good Bye!"}
 
 
@@ -61,10 +61,7 @@ async def update_user_status(
     currentUser=Depends(jwt_util.get_current_active_user),
 ):
     user = await find_existed_user(email=currentUser.email)
-    await user.update(
-        chat_status=request.chat_status.lower(),
-        modified_date=datetime.datetime.utcnow(),
-    )
+    await user_crud.update_chat_status(request.chat_status.lower(), currentUser)
     return {
         "status_code": 200,
         "message": "Status has been updated successfully!",

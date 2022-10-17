@@ -53,7 +53,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     black_list = await crud.get_users_with_black_listed_token(token)
     if black_list:
         raise credentials_exception
-
     try:
         payload = jwt.decode(
             token,
@@ -75,6 +74,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 def get_current_active_user(
     current_user: UserObjectSchema = Depends(get_current_user),
 ):
-    if current_user.user_status == "9":
+    if current_user.user_status == 9:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
