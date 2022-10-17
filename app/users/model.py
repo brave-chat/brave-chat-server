@@ -25,21 +25,15 @@ class UserRole(str, Enum):
 
 
 class Users(Base, CommonMixin, TimestampMixin):
-    first_name: str = Column(String(20), index=True)
-    last_name: str = Column(String(20), index=True)
+    first_name: str = Column(String(20))
+    last_name: str = Column(String(20))
     email: EmailStr = Column(String(50), index=True)
     password: str = Column(String(120), index=True)
-    phone_number: str = Column(String(20), index=True, nullable=True)
-    bio: Optional[str] = Column(String(60), index=True, nullable=True)
-    profile_picture: Optional[str] = Column(
-        String(220), index=True, nullable=True
-    )
-    chat_status: Optional[ChatStatus] = Column(
-        String(20), index=True, nullable=True
-    )
+    phone_number: str = Column(String(20), nullable=True)
+    bio: Optional[str] = Column(String(60), nullable=True)
+    profile_picture: Optional[str] = Column(String(220), nullable=True)
+    chat_status: Optional[ChatStatus] = Column(String(20), nullable=True)
     user_status: Optional[UserStatus] = Column(
         Integer, index=True, nullable=True
     )
-    user_role: Optional[UserRole] = Column(
-        String(20), index=True, nullable=True
-    )
+    user_role: Optional[UserRole] = Column(String(20), nullable=True)

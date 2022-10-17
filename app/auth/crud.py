@@ -1,4 +1,5 @@
 from fastapi.encoders import jsonable_encoder
+import datetime
 
 from app.auth.schemas import UserCreate, UserLoginSchema
 from app.users.schemas import UserObjectSchema
@@ -12,12 +13,12 @@ async def create_user(user: UserCreate):
     query = """
         INSERT INTO users (
           first_name, last_name, email, password,
-          user_status
+          user_status, creation_date
         )
         VALUES
           (
-            : first_name, : last_name, : email, : password,
-            1
+            :first_name, :last_name, :email, :password, 1,
+            :creation_date
           )
     """
     values = {
@@ -25,6 +26,7 @@ async def create_user(user: UserCreate):
         "last_name": user.last_name,
         "email": user.email,
         "password": user.password,
+        "creation_date": datetime.datetime.utcnow()
     }
     return await database.execute(query, values=values)
 

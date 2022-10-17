@@ -2,10 +2,21 @@ import datetime
 import re
 
 from sqlalchemy import BIGINT, Column, DateTime
-from sqlalchemy.orm import declarative_base, declarative_mixin, declared_attr
+from sqlalchemy.orm import declarative_mixin, declared_attr
 
-# declarative base class
-Base = declarative_base()
+from sqlalchemy.orm import registry
+from sqlalchemy.orm.decl_api import DeclarativeMeta
+
+mapper_registry = registry()
+
+
+class Base(metaclass=DeclarativeMeta):
+    __abstract__ = True
+
+    registry = mapper_registry
+    metadata = mapper_registry.metadata
+
+    __init__ = mapper_registry.constructor
 
 
 @declarative_mixin
@@ -29,6 +40,7 @@ class CommonMixin:
         return table_name
 
 
+@declarative_mixin
 class TimestampMixin:
     creation_date: datetime = Column(
         DateTime, default=datetime.datetime.utcnow()
