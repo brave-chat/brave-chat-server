@@ -1,8 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 import datetime
 
-# SingleSore bug: https://github.com/sqlalchemy/sqlalchemy/discussions/8650
-# from app.auth.model import AccessTokens, BlackListedTokens
+from app.auth.model import AccessTokens, BlackListedTokens
 from app.auth.schemas import UserCreate, UserLoginSchema
 from app.users.schemas import UserObjectSchema
 from app.utils.constants import ACCESS_TOKEN_EXPIRE_MINUTES
