@@ -1,13 +1,33 @@
-from fastapi.encoders import jsonable_encoder
 import datetime
+from fastapi.encoders import (
+    jsonable_encoder,
+)
 
-from app.auth.model import AccessTokens, BlackListedTokens
-from app.auth.schemas import UserCreate, UserLoginSchema
-from app.users.schemas import UserObjectSchema
-from app.utils.constants import ACCESS_TOKEN_EXPIRE_MINUTES
-from app.utils.crypt_util import get_password_hash, verify_password
-from app.utils.jwt_util import create_access_token, timedelta
-from app.utils.session import database
+from app.auth.model import (
+    AccessTokens,
+    BlackListedTokens,
+)
+from app.auth.schemas import (
+    UserCreate,
+    UserLoginSchema,
+)
+from app.users.schemas import (
+    UserObjectSchema,
+)
+from app.utils.constants import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+)
+from app.utils.crypt_util import (
+    get_password_hash,
+    verify_password,
+)
+from app.utils.jwt_util import (
+    create_access_token,
+    timedelta,
+)
+from app.utils.session import (
+    database,
+)
 
 
 async def create_user(user: UserCreate):
@@ -27,7 +47,7 @@ async def create_user(user: UserCreate):
         "last_name": user.last_name,
         "email": user.email,
         "password": user.password,
-        "creation_date": datetime.datetime.utcnow()
+        "creation_date": datetime.datetime.utcnow(),
     }
     return await database.execute(query, values=values)
 
@@ -76,7 +96,7 @@ async def login_user(form_data):
     )
     # save access_token
     query = """
-        INSERT INTO 
+        INSERT INTO
             access_tokens (
                 user,
                 token,
@@ -92,7 +112,7 @@ async def login_user(form_data):
     values = {
         "user": user_obj.id,
         "token": access_token["access_token"],
-        "creation_date": datetime.datetime.utcnow()
+        "creation_date": datetime.datetime.utcnow(),
     }
     await database.execute(query, values=values)
     return access_token

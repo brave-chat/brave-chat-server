@@ -1,15 +1,36 @@
-from datetime import datetime, timedelta
-
+from datetime import (
+    datetime,
+    timedelta,
+)
+from fastapi import (
+    Depends,
+    HTTPException,
+    status,
+)
+from fastapi.security import (
+    OAuth2PasswordBearer,
+)
 import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jwt import PyJWTError
-from pydantic import ValidationError
+from jwt import (
+    PyJWTError,
+)
+from pydantic import (
+    ValidationError,
+)
 
-from app.auth import crud
-from app.auth.schemas import TokenData
-from app.users.schemas import UserObjectSchema
-from app.utils.constants import JWT_ALGORITHM, JWT_SECRET_KEY
+from app.auth import (
+    crud,
+)
+from app.auth.schemas import (
+    TokenData,
+)
+from app.users.schemas import (
+    UserObjectSchema,
+)
+from app.utils.constants import (
+    JWT_ALGORITHM,
+    JWT_SECRET_KEY,
+)
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/auth/login", scheme_name="JWT"

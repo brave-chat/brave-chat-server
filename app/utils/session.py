@@ -1,8 +1,16 @@
-from databases import Database
-from sqlalchemy.ext.asyncio import create_async_engine
+from databases import (
+    Database,
+)
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+)
 
-from app.config import Settings
-from app.utils.mixins import Base
+from app.config import (
+    Settings,
+)
+from app.utils.mixins import (
+    Base,
+)
 
 settings = Settings()
 
@@ -40,7 +48,7 @@ async def init_models(database_url):
     )  # recycle every hour
 
     async with engine.begin() as conn:
-        #await conn.run_sync(Base.metadata.drop_all)
+        # await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     await engine.dispose()

@@ -1,19 +1,34 @@
+from fastapi import (
+    FastAPI,
+    Request,
+)
+from fastapi.middleware.cors import (
+    CORSMiddleware,
+)
 import logging
 import os
 import time
-
 import uvicorn
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 
-from app.auth import router as auth_router
-from app.config import Settings
-from app.users import router as users_router
-from app.utils.session import SQLALCHEMY_DATABASE_URL, database, init_models
+from app.auth import (
+    router as auth_router,
+)
+from app.config import (
+    Settings,
+)
+from app.users import (
+    router as users_router,
+)
+from app.utils.session import (
+    SQLALCHEMY_DATABASE_URL,
+    database,
+    init_models,
+)
 
 logger = logging.getLogger(__name__)
 
-if Settings().DEBUG == True:
+# change this if in production
+if not Settings().DEBUG:
     chat_app = FastAPI(
         docs_url="/docs",
         redoc_url="/redocs",

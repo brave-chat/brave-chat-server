@@ -1,8 +1,17 @@
-from typing import Optional
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+)
+from typing import (
+    Optional,
+)
 
-from pydantic import BaseModel, EmailStr, Field
-
-from app.users.model import ChatStatus, UserRole, UserStatus
+from app.users.model import (
+    ChatStatus,
+    UserRole,
+    UserStatus,
+)
 
 
 class UserObjectSchema(BaseModel):

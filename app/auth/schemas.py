@@ -1,8 +1,15 @@
-from typing import Optional
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+)
+from typing import (
+    Optional,
+)
 
-from pydantic import BaseModel, EmailStr, Field
-
-from app.users.schemas import UserObjectSchema
+from app.users.schemas import (
+    UserObjectSchema,
+)
 
 
 class UserSchema(BaseModel):
