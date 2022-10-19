@@ -132,3 +132,7 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 *NOTE: The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`.*
 
 *NOTE: Deta Micros are limited to 512MB per deployment.*
+
+### Heroku
+
+[![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
