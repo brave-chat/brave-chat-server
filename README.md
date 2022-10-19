@@ -22,6 +22,8 @@ Please use 'make <target>' where <target> is one of:
 
 venv                     Create a virtual environment
 install                  Install the package and all required core dependencies
+run                      Running the app locally
+deploy-deta              Deploy the app on a Deta Micro
 clean                    Remove all build, test, coverage and Python artifacts
 lint                     Check style with pre-commit
 test                     Run tests quickly with pytest
@@ -95,7 +97,7 @@ $ make run
 
 ## Deployment
 
-To use the deta version of the API you'll need to create a Deta account and obtain a project key, that's all you need for the API to work.
+To use the deta version of the API you'll need to create a Deta account.
 
 ### Deta Micros
 
@@ -126,5 +128,7 @@ $ make deploy-deta
 You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 *NOTE: Make sure your `.env` file is filled with valid env vars values accordingly.*
+
 *NOTE: The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`.*
-*NOTE: Deta Micros are limited to 128MB per deployment.*
+
+*NOTE: Deta Micros are limited to 512MB per deployment.*
