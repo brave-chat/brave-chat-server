@@ -1,11 +1,18 @@
 import datetime
 import re
-
-from sqlalchemy import BIGINT, Column, DateTime
-from sqlalchemy.orm import declarative_mixin, declared_attr
-
-from sqlalchemy.orm import registry
-from sqlalchemy.orm.decl_api import DeclarativeMeta
+from sqlalchemy import (
+    BIGINT,
+    Column,
+    DateTime,
+)
+from sqlalchemy.orm import (
+    declarative_mixin,
+    declared_attr,
+    registry,
+)
+from sqlalchemy.orm.decl_api import (
+    DeclarativeMeta,
+)
 
 mapper_registry = registry()
 

@@ -1,33 +1,104 @@
-SHELL := /bin/bash
+#Ensure the script is run as bash
+SHELL:=/bin/bash
 
-# Variables definitions
-# -----------------------------------------------------------------------------
+#Set help as the default for this makefile.
+.DEFAULT: help
 
-ifeq ($(TIMEOUT),)
-TIMEOUT := 60
-endif
+help:
+	@echo "Please use 'make <target>' where <target> is one of:"
+	@echo ""
+	@echo "venv                     Create a virtual environment"
+	@echo "install                  Install the package and all required core dependencies"
+	@echo "clean                    Remove all build, test, coverage and Python artifacts"
+	@echo "lint                     Check style with pre-commit"
+	@echo "test                     Run tests quickly with pytest"
+	@echo "test-all                 Run tests on every Python version with tox"
+	@echo "coverage                 Check code coverage quickly with the default Python"
 
-ifeq ($(MODEL_PATH),)
-MODEL_PATH := ./ml/model/
-endif
+clean: clean-build clean-pyc clean-test
 
-ifeq ($(MODEL_NAME),)
-MODEL_NAME := model.pkl
-endif
+generate_dot_env:
+	@if [[ ! -e .env ]]; then \
+		cp .env.example .env; \
+	fi
 
-# Target section and Global definitions
-# -----------------------------------------------------------------------------
-.PHONY: all clean test install run deploy down
+clean-build:
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . -name '*.egg-info' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -f {} +
 
-all: clean test install run deploy down
+clean-pyc:
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+clean-test:
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
+	rm -fr .pytest_cache
+
+venv:
+	@echo ""
+	@echo "*** make virtual env ***"
+	@echo ""
+	(rm -rf .venv; python3 -m venv .venv; source .venv/bin/activate;)
+	@echo ""
+	@echo "please activate your virtualenv by running:"
+	@echo "source .venv/bin/activate"
+	@echo ""
+
+lint:
+	@echo ""
+	@echo "*** Running formatters locally... ***"
+	@echo ""
+	@echo ""
+	tox -ve lint
+	@echo ""
 
 test:
-	poetry run pytest tests -vv --show-capture=all
+	@echo ""
+	@echo "*** Running tests locally... ***"
+	@echo ""
+	@echo ""
+	tox -e test
+	@echo ""
+
+test-all:
+	@echo ""
+	@echo "*** Running tests, formatters... ***"
+	@echo ""
+	@echo ""
+	tox
+	@echo ""
+
+coverage:
+	@echo ""
+	@echo "*** Checking code coverage, and generating a report... ***"
+	@echo ""
+	@echo ""
+	tox -e coverage
+	poetry run $(BROWSER) htmlcov/index.html
+	@echo ""
 
 install: generate_dot_env
+	@echo ""
+	@echo "*** Generating a .env file and installing the required dependencies... ***"
+	@echo ""
+	@echo ""
 	pip install --upgrade pip
 	pip install poetry
 	poetry install
+	@echo ""
+
+release: dist ## package and upload a release
+	poetry publish
+
+dist: clean ## builds source and wheel package
+	poetry build
 
 run:
 	PYTHONPATH=app/ poetry run server
@@ -39,20 +110,8 @@ up: generate_dot_env
 down:
 	docker-compose down
 
-generate_dot_env:
-	@if [[ ! -e .env ]]; then \
-		cp .env.example .env; \
-	fi
+version-major:
+	bump2version major
 
-clean:
-	@find . -name '*.pyc' -exec rm -rf {} \;
-	@find . -name '__pycache__' -exec rm -rf {} \;
-	@find . -name 'Thumbs.db' -exec rm -rf {} \;
-	@find . -name '*~' -exec rm -rf {} \;
-	rm -rf .cache
-	rm -rf build
-	rm -rf dist
-	rm -rf *.egg-info
-	rm -rf htmlcov
-	rm -rf .tox/
-	rm -rf docs/_build
+version-minor:
+	bump2version minor

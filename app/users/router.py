@@ -1,14 +1,32 @@
 import datetime
+from fastapi import (
+    APIRouter,
+    Depends,
+)
+from fastapi.encoders import (
+    jsonable_encoder,
+)
 
-from fastapi import APIRouter, Depends
-from fastapi.encoders import jsonable_encoder
-
-from app.auth.crud import find_existed_user
-from app.auth.schemas import UserSchema
-from app.users import crud as user_crud
-from app.users.model import Users
-from app.users.schemas import PersonalInfo, UpdateStatus, UserObjectSchema
-from app.utils import jwt_util
+from app.auth.crud import (
+    find_existed_user,
+)
+from app.auth.schemas import (
+    UserSchema,
+)
+from app.users import (
+    crud as user_crud,
+)
+from app.users.model import (
+    Users,
+)
+from app.users.schemas import (
+    PersonalInfo,
+    UpdateStatus,
+    UserObjectSchema,
+)
+from app.utils import (
+    jwt_util,
+)
 
 router = APIRouter(prefix="/api/v1")
 
@@ -60,8 +78,9 @@ async def update_user_status(
     request: UpdateStatus,
     currentUser=Depends(jwt_util.get_current_active_user),
 ):
-    user = await find_existed_user(email=currentUser.email)
-    await user_crud.update_chat_status(request.chat_status.lower(), currentUser)
+    await user_crud.update_chat_status(
+        request.chat_status.lower(), currentUser
+    )
     return {
         "status_code": 200,
         "message": "Status has been updated successfully!",

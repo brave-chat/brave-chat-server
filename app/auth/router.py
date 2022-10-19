@@ -1,10 +1,24 @@
-from typing import Union
+from fastapi import (
+    APIRouter,
+    Depends,
+)
+from fastapi.security import (
+    OAuth2PasswordRequestForm,
+)
+from typing import (
+    Union,
+)
 
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-
-from app.auth.crud import login_user, register_user
-from app.auth.schemas import ResponseSchema, Token, UserCreate, UserSchema
+from app.auth.crud import (
+    login_user,
+    register_user,
+)
+from app.auth.schemas import (
+    ResponseSchema,
+    Token,
+    UserCreate,
+    UserSchema,
+)
 
 router = APIRouter(prefix="/api/v1")
 

@@ -1,10 +1,21 @@
 from enum import Enum
-from typing import Optional
+from pydantic import (
+    EmailStr,
+)
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+)
+from typing import (
+    Optional,
+)
 
-from pydantic import EmailStr
-from sqlalchemy import Column, Integer, String
-
-from app.utils.mixins import Base, CommonMixin, TimestampMixin
+from app.utils.mixins import (
+    Base,
+    CommonMixin,
+    TimestampMixin,
+)
 
 
 class ChatStatus(str, Enum):
