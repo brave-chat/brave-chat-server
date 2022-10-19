@@ -1,5 +1,12 @@
 # Chat App SingleStore Based Backend
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/wiseaidev/fastapi-singlestore-backend/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/wiseaidev/fastapi-singlestore-backend/tree/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/wiseaidev/fastapi-singlestore-backend/main.svg)](https://results.pre-commit.ci/latest/github/wiseaidev/fastapi-singlestore-backend/main)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+[![Banner](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rvoa7yq0f1grhumd6s0r.png)](https://github.com/wiseaidev/fastapi-singlestore-backend)
+
+
 A fully async based backend for the [chat application](https://github.com/wiseaidev/chat) built using FastAPI, SingleStore with aiomysql, [databases](https://github.com/encode/databases), pydantic, SQLAlchemy, and Deta.
 
 ## Development Requirements
