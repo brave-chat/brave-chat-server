@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Chat App Backend"
+name = "chat-app-backend"
 version = "0.1.0"
 description = "A fully async based backend for the chat application built using FastAPI, SingleStore, databases[aiomysql], pydantic, SQLAlchemy, and Deta."
 authors = ["wiseaidev <business@wiseai.dev>"]
