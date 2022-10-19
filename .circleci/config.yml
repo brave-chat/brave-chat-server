@@ -1,0 +1,56 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2.0
+orbs:
+  coveralls: coveralls/coveralls@1.0.4
+aliases:
+  - &container_python
+    docker:
+      - image: cimg/python:3.9.10  # primary container for the build job
+
+  - &run_task_install_tox_dependencies
+    run:
+      name: install tox dependencies
+      command: |
+        sudo apt-get -qq update
+        sudo apt install -y build-essential libssl-dev libpython2-dev python3-pip
+        sudo pip3 install tox
+  - &run_task_install_dependencies_poetry
+    run:
+      name: Setup, install Poetry & dependencies
+      command: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry env use 3.9.10
+        poetry install
+
+jobs:
+  testing:
+    <<: *container_python
+    steps:
+      # Get the code
+      - checkout
+      # Cache
+      - restore_cache:
+          keys:
+            - deps-{{ checksum "poetry.lock" }}
+      - *run_task_install_tox_dependencies
+      - *run_task_install_dependencies_poetry
+      - save_cache:
+          key: deps-{{ checksum "poetry.lock" }}
+          paths:
+            - /home/circleci/.cache/pypoetry/virtualenvs
+      - run:
+          name: run tests
+          command: |
+            tox -v
+      - store_test_results:
+          path: .tox/test/tmp/reports
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - testing
