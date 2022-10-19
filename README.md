@@ -12,9 +12,7 @@ A fully async based backend for the [chat application](https://github.com/wiseai
 ## Development Requirements
 
 - Python3.9
-- Pip
 - Poetry (Python Package Manager)
-
 
 ## Installation with make
 
@@ -53,9 +51,9 @@ $ make install
 
 You can refer to [this tutorial](https://dev.to/wiseai/a-deep-dive-into-connecting-fastapi-with-singlestore-2dn8#setting-up-singlestore) to create a SingleStore account and a MySQL `chat` database.
 
-### 5. Run the server
+### 5. Set your SingleStore Credentials
 
-Fill in the following variables in your .env file accordingly:
+Fill in the following environment variables in your .env file accordingly:
 
 ```yaml
 # Database
@@ -68,7 +66,7 @@ SINGLESTORE_DATABASE=<database name>
 
 ### 6. Generate a secret key
 
-Generate a secret key using openssl and update it env var in .env file.
+Generate a secret key using openssl and update its env var in .env file.
 
 ```sh
 $ openssl rand -hex 128
@@ -94,3 +92,39 @@ $ make run
 ## Access Redocs Documentation
 
 > <http://localhost:8000/redocs>
+
+## Deployment
+
+To use the deta version of the API you'll need to create a Deta account and obtain a project key, that's all you need for the API to work.
+
+### Deta Micros
+
+This deployment option fits within the Deta theme.
+
+[![Deploy on Deta](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/wiseaidev/fastapi-singlestore-backend)
+
+### Using The CLI with make
+
+Make sure you have Deta cli on your machine. If it is not the case, just run the following command(on a linux distro or Mac):
+
+```sh
+curl -fsSL https://get.deta.dev/cli.sh | sh
+```
+
+Manually add `/home/<user_name>/.deta/bin/deta` to your path:
+
+```sh
+PATH="/home/<user_name>/.deta/bin:$PATH"
+```
+
+Now you can deploy the app on a Deta Micro:
+
+```sh
+$ make deploy-deta
+```
+
+You can then use the Deta UI to check the logs and the URL the API is hosted on.
+
+*NOTE: Make sure your `.env` file is filled with valid env vars values accordingly.*
+*NOTE: The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`.*
+*NOTE: Deta Micros are limited to 128MB per deployment.*

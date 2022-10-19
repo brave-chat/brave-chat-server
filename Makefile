@@ -9,6 +9,8 @@ help:
 	@echo ""
 	@echo "venv                     Create a virtual environment"
 	@echo "install                  Install the package and all required core dependencies"
+	@echo "run                      Running the app locally"
+	@echo "deploy-deta              Deploy the app on a Deta Micro"
 	@echo "clean                    Remove all build, test, coverage and Python artifacts"
 	@echo "lint                     Check style with pre-commit"
 	@echo "test                     Run tests quickly with pytest"
@@ -94,14 +96,35 @@ install: generate_dot_env
 	poetry install
 	@echo ""
 
+run:
+	@echo ""
+	@echo "*** Running the app locally... ***"
+	@echo ""
+	@echo ""
+	PYTHONPATH=app/ poetry run server
+	@echo ""
+
+deploy-deta:
+	@echo ""
+	@echo "*** Deploying the app on a Deta Micros... ***"
+	@echo ""
+	@echo "*** Running `deta login`... ***"
+	deta login
+	@echo "*** Running `deta new .`... ***"
+	deta new .
+	@echo "*** Running `deta deploy`... ***"
+	deta deploy
+	@echo "*** Running `deta auth disable`... ***"
+	deta auth disable
+	@echo "*** Running `deta update -e .env`... ***"
+	deta update -e .env
+	@echo ""
+
 release: dist ## package and upload a release
 	poetry publish
 
 dist: clean ## builds source and wheel package
 	poetry build
-
-run:
-	PYTHONPATH=app/ poetry run server
 
 up: generate_dot_env
 	docker-compose build

@@ -133,3 +133,6 @@ database.db
 /node_modules
 
 /build
+
+# Ignore deta config file
+.deta/

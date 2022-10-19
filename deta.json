@@ -1,0 +1,42 @@
+{
+    "name": "chat-app-backend",
+    "description": "A fully async based backend for the chat application built using FastAPI, SingleStore with aiomysql, databases, pydantic, SQLAlchemy, and Deta.",
+    "runtime": "python3.9",
+    "env": [
+        {
+            "key": "SINGLESTORE_USERNAME",
+            "description": "This is the user name you'll be creating for remote accesses. By default, this variable is equal to admin.",
+            "value": "admin",
+            "required": false
+        },
+        {
+            "key": "SINGLESTORE_PASSWORD",
+            "description": "The corresponding password for that user.",
+            "value": "",
+            "required": true
+        },
+        {
+            "key": "SINGLESTORE_HOST",
+            "description": "Your remote MySQL server's domain name.",
+            "value": "",
+            "required": true
+        },
+        {
+            "key": "SINGLESTORE_PORT",
+            "description": "The port number where MySQL is listening to.",
+            "value": "3306",
+            "required": true
+        },
+        {
+            "key": "SINGLESTORE_DATABASE",
+            "description": "The name of the database you want to access, in our case, the `chat` database.",
+            "value": "chat",
+            "required": true
+        },
+        {
+            "key": "JWT_SECRET_KEY",
+            "description": "Secret used to sign the JWTs",
+            "required": true
+        }
+    ]
+}
