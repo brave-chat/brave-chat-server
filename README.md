@@ -15,6 +15,7 @@ A fully async based backend for the [chat application](https://github.com/wiseai
 $ make
 Please use 'make <target>' where <target> is one of:
 
+venv                     Create a virtual environment
 install                  Install the package and all required core dependencies
 clean                    Remove all build, test, coverage and Python artifacts
 lint                     Check style with pre-commit
