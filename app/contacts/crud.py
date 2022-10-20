@@ -145,7 +145,14 @@ async def search_user_contacts(search: str, user_id: int):
             WHERE
               contacts.user= :user_id
             AND
-              INSTR(users.first_name, :search) > 0
+              MATCH (
+                first_name,
+                last_name,
+                email
+              )
+              AGAINST (
+                :search,
+              )
         """
         values = {"user_id": user_id, "search": search}
         return_results = await database.fetch_all(query, values=values)
