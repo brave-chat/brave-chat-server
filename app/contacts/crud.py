@@ -13,11 +13,11 @@ from app.users.model import (
 from app.users.schemas import (
     UserObjectSchema,
 )
-
-logger = logging.getLogger(__name__)
 from app.utils.session import (
     database,
 )
+
+logger = logging.getLogger(__name__)
 
 
 async def create_new_contact(contact_email: str, user_id: int):

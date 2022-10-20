@@ -12,6 +12,9 @@ import uvicorn
 from app.auth import (
     router as auth_router,
 )
+from app.chats import (
+    router as chats_router,
+)
 from app.config import (
     Settings,
 )
@@ -93,6 +96,7 @@ async def root():
 chat_app.include_router(auth_router.router, tags=["Auth"])
 chat_app.include_router(users_router.router, tags=["User"])
 chat_app.include_router(contacts_router.router, tags=["Contact"])
+chat_app.include_router(chats_router.router, tags=["Chat"])
 
 
 def serve() -> None:
