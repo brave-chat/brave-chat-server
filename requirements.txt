@@ -27,7 +27,7 @@ html5lib==1.1
 httptools==0.5.0
 identify==2.5.6
 idna==3.4
-importlib-metadata==4.13.0
+importlib-metadata==5.0.0
 jaraco.classes==3.2.3
 jeepney==0.8.0
 jsonschema==4.16.0
