@@ -6,7 +6,6 @@
 
 [![Banner](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rvoa7yq0f1grhumd6s0r.png)](https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-
 A fully async based backend for the [chat application](https://github.com/wiseaidev/chat) built using FastAPI, SingleStore with aiomysql, [databases](https://github.com/encode/databases), pydantic, SQLAlchemy, and Deta.
 
 ## Development Requirements
@@ -127,11 +126,11 @@ $ make deploy-deta
 
 You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
-*NOTE: Make sure your `.env` file is filled with valid env vars values accordingly.*
+_NOTE: Make sure your `.env` file is filled with valid env vars values accordingly._
 
-*NOTE: The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`.*
+_NOTE: The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`._
 
-*NOTE: Deta Micros are limited to 512MB per deployment.*
+_NOTE: Deta Micros are limited to 512MB per deployment._
 
 ### Heroku
 

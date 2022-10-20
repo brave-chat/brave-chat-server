@@ -1,12 +1,7 @@
 {
   "name": "chat-app-backend",
   "description": "A fully async based backend for the chat application built using FastAPI, SingleStore with aiomysql, databases, pydantic, SQLAlchemy, and Deta.",
-  "keywords": [
-    "fastapi",
-    "singlestore",
-    "deta",
-    "api"
-  ],
+  "keywords": ["fastapi", "singlestore", "deta", "api"],
   "repository": "https://github.com/wiseaidev/fastapi-singlestore-backend",
   "success_url": "/docs",
   "env": {

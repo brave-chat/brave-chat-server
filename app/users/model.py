@@ -36,8 +36,8 @@ class UserRole(str, Enum):
 
 
 class Users(Base, CommonMixin, TimestampMixin):
-    first_name: str = Column(String(20))
-    last_name: str = Column(String(20))
+    first_name: str = Column(String(20), index=True)
+    last_name: str = Column(String(20), index=True)
     email: EmailStr = Column(String(50), index=True)
     password: str = Column(String(120), index=True)
     phone_number: str = Column(String(20), nullable=True)

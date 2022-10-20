@@ -8,7 +8,7 @@ orbs:
 aliases:
   - &container_python
     docker:
-      - image: cimg/python:3.9.10  # primary container for the build job
+      - image: cimg/python:3.9.10 # primary container for the build job
 
   - &run_task_install_tox_dependencies
     run:

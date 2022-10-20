@@ -6,7 +6,6 @@ from fastapi.middleware.cors import (
     CORSMiddleware,
 )
 import logging
-import os
 import time
 import uvicorn
 
