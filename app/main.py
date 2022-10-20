@@ -16,6 +16,9 @@ from app.auth import (
 from app.config import (
     Settings,
 )
+from app.contacts import (
+    router as contacts_router,
+)
 from app.users import (
     router as users_router,
 )
@@ -90,6 +93,7 @@ async def root():
 
 chat_app.include_router(auth_router.router, tags=["Auth"])
 chat_app.include_router(users_router.router, tags=["User"])
+chat_app.include_router(contacts_router.router, tags=["Contact"])
 
 
 def serve() -> None:
