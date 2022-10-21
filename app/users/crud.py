@@ -13,7 +13,7 @@ async def deactivate_user(currentUser: Users):
         UPDATE
           users
         SET
-          user_status = 9,
+          user_status = 0,
           modified_date = :modified_date
         WHERE
           user_status = 1
@@ -27,12 +27,20 @@ async def deactivate_user(currentUser: Users):
 
 
 async def set_black_list(token: str):
-    # Get token id
-    query = "SELECT id FROM access_tokens WHERE token=:token"
-    values = {"token": token}
-    token_id = await database.fetch_one(query, values=values)
-    query = "INSERT INTO black_listed_tokens (token) VALUES (:token)"
-    values = {"token": token_id[0]}
+    query = """
+        UPDATE
+          access_tokens
+        SET
+          token_status = 0,
+          modified_date = :modified_date
+        WHERE
+          token_status = 1
+          AND token = :token
+    """
+    values = {
+        "token": token,
+        "modified_date": datetime.datetime.utcnow(),
+    }
     return await database.execute(query, values=values)
 
 

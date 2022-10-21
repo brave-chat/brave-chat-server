@@ -4,6 +4,9 @@ from databases import (
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
+from sqlalchemy.pool import (
+    NullPool,
+)
 
 from app.config import (
     Settings,

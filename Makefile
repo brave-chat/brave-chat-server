@@ -91,9 +91,11 @@ install: generate_dot_env
 	@echo "*** Generating a .env file and installing the required dependencies... ***"
 	@echo ""
 	@echo ""
-	pip install --upgrade pip
-	pip install poetry
-	poetry install
+	: `curl -sSL https://install.python-poetry.org | python3 - --uninstall`
+	: `rm -rf /home/${USER}/.poetry`
+	: `rm -rf /home/${USER}/.pyenv/shims/poetry`
+	curl -sSL https://install.python-poetry.org | python3 - --version 1.2.2
+	poetry install --only main
 	@echo ""
 
 run:

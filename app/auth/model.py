@@ -1,12 +1,16 @@
+from enum import Enum
 from sqlalchemy import (
-    BIGINT,
     Column,
     ForeignKey,
+    Integer,
     String,
 )
 from sqlalchemy.orm import (
     backref,
     relationship,
+)
+from typing import (
+    Optional,
 )
 
 from app.utils.mixins import (
@@ -14,6 +18,11 @@ from app.utils.mixins import (
     CommonMixin,
     TimestampMixin,
 )
+
+
+class TokenStatus(int, Enum):
+    active = 1
+    disabled = 0
 
 
 class AccessTokens(Base, CommonMixin, TimestampMixin):
@@ -24,12 +33,4 @@ class AccessTokens(Base, CommonMixin, TimestampMixin):
 
     user: int = Column(ForeignKey("users.id"), index=True)
     token: str = Column(String(220), index=True)
-
-
-class BlackListedTokens(Base, CommonMixin, TimestampMixin):
-    __table_args__ = {
-        "mysql_engine": "InnoDB",
-        "prefixes": ["ROWSTORE", "REFERENCE"],
-    }
-
-    token: int = Column(ForeignKey("access_tokens.id"), index=True)
+    token_status: Optional[TokenStatus] = Column(Integer, nullable=True)

@@ -10,8 +10,8 @@ A fully async based backend for the [chat application](https://github.com/wiseai
 
 ## Development Requirements
 
-- Python3.9
-- Poetry (Python Package Manager)
+- Python (3.9)
+- Poetry (1.2.2)
 
 ## Installation with make
 

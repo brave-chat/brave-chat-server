@@ -30,7 +30,7 @@ class ChatStatus(str, Enum):
 
 class UserStatus(int, Enum):
     active = 1
-    disabled = 9
+    disabled = 0
 
 
 class UserRole(str, Enum):
@@ -41,9 +41,9 @@ class UserRole(str, Enum):
 class Users(Base, CommonMixin, TimestampMixin):
     __table_args__ = (Fulltext("first_name, last_name, email"),)
 
-    first_name: str = Column(String(20))
-    last_name: str = Column(String(20))
-    email: EmailStr = Column(String(50))
+    first_name: str = Column(String(20), index=True)
+    last_name: str = Column(String(20), index=True)
+    email: EmailStr = Column(String(50), index=True)
     password: str = Column(String(120), index=True)
     phone_number: str = Column(String(20), nullable=True)
     bio: Optional[str] = Column(String(60), nullable=True)
