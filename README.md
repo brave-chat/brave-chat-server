@@ -135,3 +135,7 @@ _NOTE: Deta Micros are limited to 512MB per deployment._
 ### Heroku
 
 [![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
+
+### Vercel
+
+[![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend&env=JWT_SECRET_KEY,SINGLESTORE_USERNAME,SINGLESTORE_PASSWORD,SINGLESTORE_HOST,SINGLESTORE_PORT,SINGLESTORE_DATABASE&envDescription=Your%20SingleStoreDB%20Account%2C%20Credentials%20%20and%20JWT_SECRET_KEY%20ID%20)
