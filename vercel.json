@@ -4,6 +4,6 @@
 	"routes": [
 		{ "src": "/", "dest": "main.py" },
 		{ "src": "/docs", "dest": "main.py" },
-		{ "src": "/openapi.json", "dest": "main.py" }
+		{ "src": "/redocs", "dest": "main.py" },
 	]
 }
