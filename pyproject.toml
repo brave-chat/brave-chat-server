@@ -25,7 +25,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.10"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 fastapi = {extras = ["uvicorn"], version = "^0.81.0"}
 PyJWT = "^2.4.0"
@@ -34,10 +34,10 @@ python-multipart = "^0.0.5"
 deta = "^1.1.0"
 pydantic = {extras = ["email"], version = "^1.9.2"}
 databases = {extras = ["aiomysql"], version = "^0.6.1"}
-SQLAlchemy = "^1.4.41"
+SQLAlchemy = "==1.4.41"
 
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
+[tool.poetry.group.dev.dependencies]
+pytest = "^6.1.0"
 flake8 = "^5.0.4"
 coverage = "^6.5.0"
 mypy = "^0.982"
@@ -46,6 +46,10 @@ tox = "^3.26.0"
 isort = "^5.10.1"
 black = "^22.10.0"
 pre-commit = "^2.20.0"
+asyncpg = "^0.26.0"
+httpx = "^0.23.0"
+pytest-asyncio = "^0.19.0"
+asgi-lifespan = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

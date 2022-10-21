@@ -39,6 +39,11 @@ async def send_new_message(
                 "status_code": 400,
                 "message": "You can't send a message to a non existing user!",
             }
+        if receiver.id == sender.id:
+            return {
+                "status_code": 400,
+                "message": "You can't send a message to yourself!",
+            }
         query = """
             INSERT INTO messages (
               sender,
@@ -66,9 +71,52 @@ async def send_new_message(
             "creation_date": datetime.datetime.utcnow(),
         }
         await database.execute(query, values=values)
-    await database.execute(query, values=values)
     results = {
         "status_code": 201,
         "message": "A new message has been delivered successfully!",
+    }
+    return results
+
+
+async def get_sender_receiver_messages(
+    sender: UserObjectSchema, receiver: str
+):
+    receiver = await find_existed_user(email=receiver)
+    if not receiver:
+        return {
+            "status_code": 400,
+            "message": "Contact not found!",
+        }
+    query = """
+        SELECT
+            id,
+            content,
+            CASE
+                WHEN sender = :sender_id THEN "sent"
+                WHEN receiver = :sender_id THEN "received"
+                ELSE NULL
+            END as type,
+            media,
+            creation_date
+        FROM
+            messages
+        WHERE (
+          sender = :sender_id
+            AND
+          receiver = :receiver_id
+        )
+        OR (
+          sender = :receiver_id
+            AND
+          receiver = :sender_id
+        )
+        ORDER BY
+          creation_date
+    """
+    values = {"sender_id": sender.id, "receiver_id": receiver.id}
+    messages_sent_received = await database.fetch_all(query, values=values)
+    results = {
+        "status_code": 200,
+        "result": messages_sent_received,
     }
     return results

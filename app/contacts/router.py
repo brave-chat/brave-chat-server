@@ -61,25 +61,25 @@ async def add_contact(
     return results
 
 
-@router.get(
-    "/contact",
-    status_code=200,
-    response_model=Union[GetAllContactsResults, ResponseSchema],
-    name="contacts:get-all-contacts",
-    responses={
-        200: {
-            "description": "A list of contacts for each user.",
-        },
-    },
-)
-async def get_all_contacts(
-    currentUser: UserObjectSchema = Depends(get_current_active_user),
-):
-    """
-    Get all contacts grouped by users.
-    """
-    results = await get_contacts()
-    return results
+# @router.get(
+#     "/contact",
+#     status_code=200,
+#     response_model=Union[GetAllContactsResults, ResponseSchema],
+#     name="contacts:get-all-contacts",
+#     responses={
+#         200: {
+#             "description": "A list of contacts for each user.",
+#         },
+#     },
+# )
+# async def get_all_contacts(
+#     currentUser: UserObjectSchema = Depends(get_current_active_user),
+# ):
+#     """
+#     Get all contacts grouped by users.
+#     """
+#     results = await get_contacts()
+#     return results
 
 
 @router.get(

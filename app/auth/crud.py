@@ -5,7 +5,6 @@ from fastapi.encoders import (
 
 from app.auth.model import (
     AccessTokens,
-    BlackListedTokens,
 )
 from app.auth.schemas import (
     UserCreate,
@@ -33,14 +32,21 @@ from app.utils.session import (
 async def create_user(user: UserCreate):
     query = """
         INSERT INTO users (
-          first_name, last_name, email, password,
-          user_status, creation_date
+          first_name,
+          last_name,
+          email,
+          password,
+          user_status,
+          creation_date
         )
-        VALUES
-          (
-            :first_name, :last_name, :email, :password, 1,
-            :creation_date
-          )
+        VALUES (
+          :first_name,
+          :last_name,
+          :email,
+          :password,
+          1,
+          :creation_date
+        )
     """
     values = {
         "first_name": user.first_name,
@@ -69,11 +75,11 @@ async def get_users_with_black_listed_token(token: str):
         SELECT
           *
         FROM
-          black_listed_tokens
-        INNER JOIN access_tokens
-          ON black_listed_tokens.token = access_tokens.id
+          access_tokens
         WHERE
-          access_tokens.token = :token
+          token = :token
+        AND
+          token_status = 0
     """
     values = {"token": token}
     return await database.fetch_one(query, values=values)
@@ -100,13 +106,15 @@ async def login_user(form_data):
             access_tokens (
                 user,
                 token,
-                creation_date
+                creation_date,
+                token_status
             )
         VALUES
             (
                 :user,
                 :token,
-                :creation_date
+                :creation_date,
+                1
             )
     """
     values = {

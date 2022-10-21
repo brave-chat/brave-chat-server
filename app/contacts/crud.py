@@ -151,7 +151,7 @@ async def search_user_contacts(search: str, user_id: int):
                 email
               )
               AGAINST (
-                :search,
+                :search
               )
         """
         values = {"user_id": user_id, "search": search}

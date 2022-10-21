@@ -2,14 +2,19 @@ from fastapi import (
     APIRouter,
     Depends,
 )
+from typing import (
+    Union,
+)
 
 from app.auth.schemas import (
     ResponseSchema,
 )
-from app.chats.crud import (  # get_sender_receiver_messages,
+from app.chats.crud import (
+    get_sender_receiver_messages,
     send_new_message,
 )
-from app.chats.schemas import (  # GetAllMessageResult,; GetAllMessageResults,
+from app.chats.schemas import (
+    GetAllMessageResults,
     MessageCreate,
 )
 from app.users.schemas import (
@@ -49,24 +54,24 @@ async def send_message(
     return results
 
 
-# @router.get(
-#     "/conversation",
-#     response_model=GetAllMessageResults,
-#     status_code=200,
-#     name="chats:get-all-conversations",
-#     responses={
-#         200: {
-#             "model": GetAllMessageResults,
-#             "description": "Return a list of messages between two parties.",
-#         },
-#     },
-# )
-# async def get_conversation(
-#     receiver: str,
-#     currentUser: UserObjectSchema = Depends(get_current_active_user),
-# ):
-#     """
-#     Return all messages grouped by senders for a given receiver.
-#     """
-#     results = await get_sender_receiver_messages(currentUser, receiver)
-#     return results
+@router.get(
+    "/conversation",
+    response_model=Union[ResponseSchema, GetAllMessageResults],
+    status_code=200,
+    name="chats:get-all-conversations",
+    responses={
+        200: {
+            "model": GetAllMessageResults,
+            "description": "Return a list of messages between two parties.",
+        },
+    },
+)
+async def get_conversation(
+    receiver: str,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+):
+    """
+    Return all messages grouped by senders for a given receiver.
+    """
+    results = await get_sender_receiver_messages(currentUser, receiver)
+    return results
