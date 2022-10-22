@@ -1,9 +1,15 @@
 {
-	"version": 2,
-	"builds": [{ "src": "main.py", "use": "@vercel/python" }],
-	"routes": [
-		{ "src": "/", "dest": "main.py" },
-		{ "src": "/docs", "dest": "main.py" },
-		{ "src": "/api/(.*)", "dest": "main.py" },
-	]
+    "builds": [{ "src": "main.py", "use": "@vercel/python" }],
+    "routes": [
+        { "src": "/.*", "dest": "main.py" }
+    ],
+    "env": {
+    "SINGLESTORE_USERNAME": "@SINGLESTORE_USERNAME",
+    "SINGLESTORE_PASSWORD": "@SINGLESTORE_PASSWORD",
+    "SINGLESTORE_HOST": "@SINGLESTORE_HOST",
+    "SINGLESTORE_PORT": "@SINGLESTORE_PORT",
+    "SINGLESTORE_DATABASE": "@SINGLESTORE_DATABASE",
+    "JWT_SECRET_KEY": "@JWT_SECRET_KEY",
+    "DEBUG": "@DEBUG",
+  }
 }
