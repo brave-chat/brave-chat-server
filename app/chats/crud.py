@@ -10,6 +10,10 @@ from app.chats.model import (
 from app.chats.schemas import (
     MessageCreate,
 )
+from app.rooms.model import (
+    RoomMembers,
+    Rooms,
+)
 from app.users.schemas import (
     UserObjectSchema,
 )
@@ -21,55 +25,84 @@ logger = logging.getLogger(__name__)
 
 
 async def send_new_message(
-    sender: UserObjectSchema, request: MessageCreate, file
+    sender: UserObjectSchema, request: MessageCreate, file, room_id: int
 ):
     # Check for empty message
     if isinstance(request, str) and file:
         # TODO: file upload
         ...
     else:
-        if not request.content:
-            return {
-                "status_code": 400,
-                "message": "You can't send an empty message!",
+        if not room_id:
+            if not request.content:
+                return {
+                    "status_code": 400,
+                    "message": "You can't send an empty message!",
+                }
+            receiver = await find_existed_user(email=request.receiver)
+            if not receiver:
+                return {
+                    "status_code": 400,
+                    "message": "You can't send a message to a non existing"
+                    " user!",
+                }
+            if receiver.id == sender.id:
+                return {
+                    "status_code": 400,
+                    "message": "You can't send a message to yourself!",
+                }
+            query = """
+                INSERT INTO messages (
+                  sender,
+                  receiver,
+                  content,
+                  message_type,
+                  media,
+                  creation_date
+                )
+                VALUES (
+                  :sender,
+                  :receiver,
+                  :content,
+                  :message_type,
+                  :media,
+                  :creation_date
+                )
+            """
+            values = {
+                "sender": sender.id,
+                "receiver": receiver.id,
+                "content": request.content,
+                "message_type": request.message_type,
+                "media": request.media,
+                "creation_date": datetime.datetime.utcnow(),
             }
-        receiver = await find_existed_user(email=request.receiver)
-        if not receiver:
-            return {
-                "status_code": 400,
-                "message": "You can't send a message to a non existing user!",
+        else:
+            query = """
+                INSERT INTO messages (
+                  sender,
+                  room,
+                  content,
+                  message_type,
+                  media,
+                  creation_date
+                )
+                VALUES (
+                  :sender,
+                  :room,
+                  :content,
+                  :message_type,
+                  :media,
+                  :creation_date
+                )
+            """
+            values = {
+                "sender": sender.id,
+                "room": room_id,
+                "content": request.content,
+                "message_type": request.message_type,
+                "media": request.media,
+                "creation_date": datetime.datetime.utcnow(),
             }
-        if receiver.id == sender.id:
-            return {
-                "status_code": 400,
-                "message": "You can't send a message to yourself!",
-            }
-        query = """
-            INSERT INTO messages (
-              sender,
-              receiver,
-              content,
-              message_type,
-              media,
-              creation_date
-            )
-            VALUES (
-              :sender,
-              :receiver,
-              :content,
-              :message_type,
-              :media,
-              :creation_date
-            )
-        """
-        values = {
-            "sender": sender.id,
-            "receiver": receiver.id,
-            "content": request.content,
-            "message_type": request.message_type,
-            "media": "",
-            "creation_date": datetime.datetime.utcnow(),
-        }
         await database.execute(query, values=values)
     results = {
         "status_code": 201,

@@ -21,6 +21,9 @@ from app.config import (
 from app.contacts import (
     router as contacts_router,
 )
+from app.rooms import (
+    router as rooms_router,
+)
 from app.users import (
     router as users_router,
 )
@@ -97,6 +100,7 @@ chat_app.include_router(auth_router.router, tags=["Auth"])
 chat_app.include_router(users_router.router, tags=["User"])
 chat_app.include_router(contacts_router.router, tags=["Contact"])
 chat_app.include_router(chats_router.router, tags=["Chat"])
+chat_app.include_router(rooms_router.router, tags=["Room"])
 
 
 def serve() -> None:
