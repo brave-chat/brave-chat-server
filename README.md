@@ -10,6 +10,7 @@ A fully async based backend for the [chat application](https://github.com/wiseai
 
 ## Development Requirements
 
+- A Debian Distro
 - Python (3.9)
 - Poetry (1.2.2)
 
