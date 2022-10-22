@@ -19,6 +19,7 @@ class Messages(Base, CommonMixin, TimestampMixin):
 
     sender: int = Column(ForeignKey("users.id"), index=True)
     receiver: int = Column(ForeignKey("users.id"), index=True)
+    room: int = Column(ForeignKey("rooms.id"), index=True, default=None)
     content: str = Column(String(1024), index=True)
     message_type: str = Column(String(10), index=True)
     media: str = Column(String(10))
