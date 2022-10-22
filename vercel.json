@@ -11,5 +11,6 @@
     "SINGLESTORE_DATABASE": "@SINGLESTORE_DATABASE",
     "JWT_SECRET_KEY": "@JWT_SECRET_KEY",
     "DEBUG": "@DEBUG",
+    "testing": "@testing",
   }
 }
