@@ -2,7 +2,7 @@ var exec = require('child_process').exec;
 
 export const handler = async () => {
     await new Promise((resolve, reject) => {
-        exec('ls -la',
+        exec('uvicorn main:app --reload',
             function (error, stdout, stderr) {
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);

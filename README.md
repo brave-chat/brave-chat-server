@@ -1,7 +1,8 @@
 # Chat App SingleStore Based Backend
 
 ![Vercel](https://vercelbadge.vercel.app/api/wiseaidev/fastapi-singlestore-backend)
-![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+![Codeql](https://github.com/github/docs/actions/workflows/codeql.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/wiseaidev/fastapi-singlestore-backend/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/wiseaidev/fastapi-singlestore-backend/tree/main)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/wiseaidev/fastapi-singlestore-backend/main.svg)](https://results.pre-commit.ci/latest/github/wiseaidev/fastapi-singlestore-backend/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -129,11 +130,13 @@ $ make deploy-deta
 
 You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
-_NOTE: Make sure your `.env` file is filled with valid env vars values accordingly._
+**Notes**:
 
-_NOTE: The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`._
+- _Make sure your `.env` file is being provided with valid env vars values accordingly._
 
-_NOTE: Deta Micros are limited to 512MB per deployment._
+- _The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`._
+
+- _Deta Micros are limited to 512MB per deployment._
 
 ### Heroku
 
@@ -145,6 +148,6 @@ _NOTE: Deta Micros are limited to 512MB per deployment._
 
 ### Netlify
 
-Running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is allowed on Netlify, which means that you can only deploy statically generated websites like docs and such.
+Running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is currently allowed on Netlify, which means that you can only deploy statically generated websites like docs and such. I tried to hack my way around it by creating a serverless function that executes `uvicorn main:app --reload` in the background. However, the serverless function is being deployed on a different environment.
 
 [![Deploy on Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/wiseaidev/fastapi-singlestore-backend)
