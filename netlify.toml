@@ -1,0 +1,14 @@
+[[redirects]]
+  from = "/*"
+  to = "/main.py"
+  status = 200
+
+[template.environment]
+  SINGLESTORE_USERNAME = "Your SingleStoreDB Account Username"
+  SINGLESTORE_PASSWORD = "Your SingleStoreDB Account Password"
+  SINGLESTORE_HOST = "Your SingleStoreDB Host Url"
+  SINGLESTORE_PORT = "Your SingleStoreDB Port Number"
+  SINGLESTORE_DATABASE = "Your Database Name"
+  JWT_SECRET_KEY = "Your JWT Secret Key"
+  DEBUG = "Debug Option"
+  PYTHON_VERSION = "3.7"
