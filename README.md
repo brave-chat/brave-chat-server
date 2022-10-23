@@ -1,5 +1,7 @@
 # Chat App SingleStore Based Backend
 
+![Vercel](https://vercelbadge.vercel.app/api/wiseaidev/fastapi-singlestore-backend)
+![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/wiseaidev/fastapi-singlestore-backend/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/wiseaidev/fastapi-singlestore-backend/tree/main)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/wiseaidev/fastapi-singlestore-backend/main.svg)](https://results.pre-commit.ci/latest/github/wiseaidev/fastapi-singlestore-backend/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -140,3 +142,9 @@ _NOTE: Deta Micros are limited to 512MB per deployment._
 ### Vercel
 
 [![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend&env=JWT_SECRET_KEY,SINGLESTORE_USERNAME,SINGLESTORE_PASSWORD,SINGLESTORE_HOST,SINGLESTORE_PORT,SINGLESTORE_DATABASE&envDescription=Your%20SingleStoreDB%20Account%2C%20Credentials%20and%20JWT_SECRET_KEY%20)
+
+### Netlify
+
+Running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is allowed on Netlify, which means that you can only deploy statically generated websites like docs and such.
+
+[![Deploy on Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/wiseaidev/fastapi-singlestore-backend)

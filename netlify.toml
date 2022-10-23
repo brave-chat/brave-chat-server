@@ -1,0 +1,24 @@
+[[redirects]]
+  from = "/*"
+  to = "/docs"
+  status = 200
+
+[template.environment]
+  SINGLESTORE_USERNAME = "Your SingleStoreDB Account Username"
+  SINGLESTORE_PASSWORD = "Your SingleStoreDB Account Password"
+  SINGLESTORE_HOST = "Your SingleStoreDB Host Url"
+  SINGLESTORE_PORT = "Your SingleStoreDB Port Number"
+  SINGLESTORE_DATABASE = "Your Database Name"
+  JWT_SECRET_KEY = "Your JWT Secret Key"
+  DEBUG = "Debug Option"
+  PYTHON_VERSION = "3.8"
+
+[dev]
+  command = "uvicorn main:app --reload"
+  port = 8080
+  targetPort = 8000
+  autoLaunch = true
+  framework = "#custom"
+
+[functions]
+  node_bundler = "esbuild"
