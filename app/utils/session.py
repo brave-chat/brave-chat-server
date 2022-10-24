@@ -17,7 +17,21 @@ from app.utils.mixins import (
 
 settings = Settings()
 
-if not settings.DEBUG:
+if settings.DEBUG:
+    SQLALCHEMY_DATABASE_URL = (
+        "mysql+aiomysql://"
+        + settings.SINGLESTORE_USERNAME
+        + ":"
+        + settings.SINGLESTORE_PASSWORD
+        + "@"
+        + settings.SINGLESTORE_HOST
+        + ":"
+        + settings.SINGLESTORE_PORT
+        + "/"
+        + "test"
+    )
+
+else:
     SQLALCHEMY_DATABASE_URL = (
         "mysql+aiomysql://"
         + settings.SINGLESTORE_USERNAME
@@ -29,10 +43,6 @@ if not settings.DEBUG:
         + settings.SINGLESTORE_PORT
         + "/"
         + settings.SINGLESTORE_DATABASE
-    )
-else:
-    SQLALCHEMY_DATABASE_URL = (
-        "mysql+aiomysql://mahmoud:password@localhost:3306/chat"
     )
 
 database = Database(SQLALCHEMY_DATABASE_URL)
