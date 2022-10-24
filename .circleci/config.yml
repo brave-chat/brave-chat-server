@@ -28,13 +28,13 @@ aliases:
     run:
       name: setup environment variables.
       command: |
-        export DEBUG=$DEBUG
-        export JWT_SECRET_KEY=$JWT_SECRET_KEY
-        export SINGLESTORE_USERNAME=$SINGLESTORE_USERNAME
-        export SINGLESTORE_PASSWORD=$SINGLESTORE_PASSWORD
-        export SINGLESTORE_HOST=$SINGLESTORE_HOST
-        export SINGLESTORE_PORT=$SINGLESTORE_PORT
-        export SINGLESTORE_DATABASE=$SINGLESTORE_DATABASE
+        echo export DEBUG=${DEBUG} >> ./.env
+        echo export JWT_SECRET_KEY=${JWT_SECRET_KEY} >> ./.env
+        echo export SINGLESTORE_USERNAME=${SINGLESTORE_USERNAME} >> ./.env
+        echo export SINGLESTORE_PASSWORD=${SINGLESTORE_PASSWORD} >> ./.env
+        echo export SINGLESTORE_HOST=${SINGLESTORE_HOST} >> ./.env
+        echo export SINGLESTORE_PORT=${SINGLESTORE_PORT} >> ./.env
+        echo export SINGLESTORE_DATABASE=${SINGLESTORE_DATABASE} >> ./.env
 
 jobs:
   testing:
