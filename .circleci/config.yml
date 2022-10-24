@@ -24,6 +24,17 @@ aliases:
         curl -sSL https://install.python-poetry.org | python3 - --version 1.2.2
         poetry env use 3.9.10
         poetry install
+  - &set_env_vars
+    run:
+      name: setup environment variables.
+      command: |
+        export DEBUG=$DEBUG
+        export JWT_SECRET_KEY=$JWT_SECRET_KEY
+        export SINGLESTORE_USERNAME=$SINGLESTORE_USERNAME
+        export SINGLESTORE_PASSWORD=$SINGLESTORE_PASSWORD
+        export SINGLESTORE_HOST=$SINGLESTORE_HOST
+        export SINGLESTORE_PORT=$SINGLESTORE_PORT
+        export SINGLESTORE_DATABASE=$SINGLESTORE_DATABASE
 
 jobs:
   testing:
@@ -37,6 +48,7 @@ jobs:
             - deps-{{ checksum "poetry.lock" }}
       - *run_task_install_tox_dependencies
       - *run_task_install_dependencies_poetry
+      - *set_env_vars
       - save_cache:
           key: deps-{{ checksum "poetry.lock" }}
           paths:
