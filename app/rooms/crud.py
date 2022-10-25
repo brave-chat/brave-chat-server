@@ -1,5 +1,8 @@
 import datetime
 import logging
+from sqlalchemy.sql import (
+    text,
+)
 from typing import (
     Optional,
 )
@@ -17,7 +20,7 @@ from app.users.schemas import (
     UserObjectSchema,
 )
 from app.utils.session import (
-    database,
+    settings,
 )
 
 logger = logging.getLogger(__name__)
@@ -33,7 +36,9 @@ async def find_existed_room(room_name: str):
           room_name = :room_name
     """
     values = {"room_name": room_name}
-    return await database.fetch_one(query, values=values)
+
+    result = await settings.connection.execute(text(query), values)
+    return result.fetchone()
 
 
 async def find_existed_user_in_room(user_id: int, room_id: int):
@@ -48,7 +53,9 @@ async def find_existed_user_in_room(user_id: int, room_id: int):
           member = :user_id
     """
     values = {"room_id": room_id, "user_id": user_id}
-    return await database.fetch_one(query, values=values)
+
+    result = await settings.connection.execute(text(query), values)
+    return result.fetchone()
 
 
 async def create_room(room_name: int, description: str):
@@ -69,7 +76,9 @@ async def create_room(room_name: int, description: str):
         "description": description,
         "creation_date": datetime.datetime.utcnow(),
     }
-    return await database.fetch_one(query, values=values)
+
+    result = await settings.connection.execute(text(query), values)
+    return result.fetchone()
 
 
 async def join_room(user_id: int, room_id: int):
@@ -90,7 +99,8 @@ async def join_room(user_id: int, room_id: int):
         "member": user_id,
         "creation_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+
+    return await settings.connection.execute(text(query), values)
 
 
 async def create_assign_new_room(user_id: int, room_obj):
@@ -165,7 +175,8 @@ async def get_room_conversations(room_name: str, sender_id: int):
           creation_date
     """
     values = {"room_id": room.id, "sender_id": sender_id}
-    messages_sent_received = await database.fetch_all(query, values=values)
+    result = await settings.connection.execute(text(query), values)
+    messages_sent_received = result.fetchall()
     results = {
         "status_code": 200,
         "result": messages_sent_received,

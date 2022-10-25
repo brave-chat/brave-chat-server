@@ -6,6 +6,12 @@ from fastapi.middleware.cors import (
     CORSMiddleware,
 )
 import logging
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
+from sqlalchemy.orm import (
+    sessionmaker,
+)
 import time
 import uvicorn
 
@@ -27,14 +33,14 @@ from app.rooms import (
 from app.users import (
     router as users_router,
 )
+from app.utils.dependencies import (
+    get_db_session,
+)
 from app.utils.session import (
-    SQLALCHEMY_DATABASE_URL,
-    database,
-    init_models,
+    init_engine_app,
 )
 
 logger = logging.getLogger(__name__)
-
 # change this if in production
 if not Settings().DEBUG:
     chat_app = FastAPI(
@@ -47,11 +53,12 @@ if not Settings().DEBUG:
     )
 else:
     chat_app = FastAPI(
-        debug=True,
-        title="API",
-        openapi_url=None,
-        docs_url=None,
-        redoc_url=None,
+        docs_url="/docs",
+        redoc_url="/redocs",
+        title="Realtime Chat App",
+        description="Realtime Chat App Backend",
+        version="1.0",
+        openapi_url="/api/v1/openapi.json",
     )
 
 origins = [
@@ -71,24 +78,21 @@ chat_app.add_middleware(
 
 @chat_app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    request.state.connection = database
-    response = await call_next(request)
     start_time = time.time()
+    response = await call_next(request)
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
-
     return response
 
 
 @chat_app.on_event("startup")
 async def startup():
-    await init_models(SQLALCHEMY_DATABASE_URL)
-    await database.connect()
+    await init_engine_app(chat_app)
 
 
 @chat_app.on_event("shutdown")
 async def shutdown():
-    await database.disconnect()
+    await chat_app.state.db_engine.dispose()
 
 
 @chat_app.get("/api")

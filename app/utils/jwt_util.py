@@ -17,6 +17,9 @@ from jwt import (
 from pydantic import (
     ValidationError,
 )
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
 
 from app.auth import (
     crud,
@@ -30,6 +33,9 @@ from app.users.schemas import (
 from app.utils.constants import (
     JWT_ALGORITHM,
     JWT_SECRET_KEY,
+)
+from app.utils.dependencies import (
+    get_db_session,
 )
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -64,14 +70,17 @@ async def create_access_token(
         }
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(get_db_session),
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    black_list = await crud.get_users_with_black_listed_token(token)
+    black_list = await crud.get_users_with_black_listed_token(token, session)
     if black_list:
         raise credentials_exception
     try:
@@ -86,7 +95,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(email=username)
     except (PyJWTError, ValidationError):
         raise credentials_exception
-    user = await crud.find_existed_user(token_data.email)
+    user = await crud.find_existed_user(token_data.email, session)
     if user is None:
         raise credentials_exception
     return user

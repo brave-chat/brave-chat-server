@@ -6,19 +6,14 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.config import (
-    Settings,
+    settings,
 )
-from app.utils.session import (
-    SQLALCHEMY_DATABASE_URL,
-)
-
-settings = Settings()
 
 
 async def create_database() -> None:
     """Create a databse."""
     engine = create_async_engine(
-        SQLALCHEMY_DATABASE_URL[:-5],
+        settings.db_url[:-5],
         pool_pre_ping=True,
         pool_size=30,
         max_overflow=30,
@@ -47,7 +42,7 @@ async def create_database() -> None:
 async def drop_database() -> None:
     """Drop current database."""
     engine = create_async_engine(
-        SQLALCHEMY_DATABASE_URL[:-5],
+        settings.db_url[:-5],
         pool_pre_ping=True,
         pool_size=30,
         max_overflow=30,

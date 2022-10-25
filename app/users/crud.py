@@ -1,10 +1,13 @@
 import datetime
+from sqlalchemy.sql import (
+    text,
+)
 
 from app.users.model import (
     Users,
 )
 from app.utils.session import (
-    database,
+    settings,
 )
 
 
@@ -23,7 +26,8 @@ async def deactivate_user(currentUser: Users):
         "email": currentUser.email,
         "modified_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+
+    return await settings.connection.execute(text(query), values)
 
 
 async def set_black_list(token: str):
@@ -41,7 +45,8 @@ async def set_black_list(token: str):
         "token": token,
         "modified_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+
+    return await settings.connection.execute(text(query), values)
 
 
 async def update_user_info(currentUser: Users):
@@ -66,7 +71,8 @@ async def update_user_info(currentUser: Users):
         "email": currentUser.email,
         "modified_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+
+    return await settings.connection.execute(text(query), values)
 
 
 async def update_chat_status(chat_status: str, currentUser: Users):
@@ -85,4 +91,5 @@ async def update_chat_status(chat_status: str, currentUser: Users):
         "email": currentUser.email,
         "modified_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+
+    return await settings.connection.execute(text(query), values)

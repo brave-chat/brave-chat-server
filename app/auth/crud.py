@@ -2,10 +2,13 @@ import datetime
 from fastapi.encoders import (
     jsonable_encoder,
 )
-
-from app.auth.model import (
-    AccessTokens,
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
 )
+from sqlalchemy.sql import (
+    text,
+)
+
 from app.auth.schemas import (
     UserCreate,
     UserLoginSchema,
@@ -24,12 +27,9 @@ from app.utils.jwt_util import (
     create_access_token,
     timedelta,
 )
-from app.utils.session import (
-    database,
-)
 
 
-async def create_user(user: UserCreate):
+async def create_user(user: UserCreate, session: AsyncSession):
     query = """
         INSERT INTO users (
           first_name,
@@ -55,22 +55,26 @@ async def create_user(user: UserCreate):
         "password": user.password,
         "creation_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+    return await session.execute(text(query), values)
 
 
-async def find_existed_user(email: str):
+async def find_existed_user(email: str, session: AsyncSession):
     query = "SELECT * FROM users WHERE email=:email AND user_status=1"
     values = {"email": email}
-    return await database.fetch_one(query, values=values)
+    result = await session.execute(text(query), values)
+    user = result.fetchone()
+    return user
 
 
-async def find_existed_user_id(id: int):
+async def find_existed_user_id(id: int, session: AsyncSession):
     query = "SELECT * FROM users WHERE id=:id AND user_status=1"
     values = {"id": id}
-    return await database.fetch_one(query, values=values)
+    result = await session.execute(text(query), values)
+    user = result.fetchone()
+    return user
 
 
-async def get_users_with_black_listed_token(token: str):
+async def get_users_with_black_listed_token(token: str, session: AsyncSession):
     query = """
         SELECT
           *
@@ -82,14 +86,15 @@ async def get_users_with_black_listed_token(token: str):
           token_status = 0
     """
     values = {"token": token}
-    return await database.fetch_one(query, values=values)
+    result = await session.execute(text(query), values)
+    token = result.fetchone()
+    return token
 
 
-async def login_user(form_data):
-    user_obj = await find_existed_user(form_data.username)
+async def login_user(form_data, session: AsyncSession):
+    user_obj = await find_existed_user(form_data.username, session)
     if not user_obj:
         return {"status_code": 400, "message": "User not found!"}
-
     user = UserLoginSchema(email=user_obj.email, password=user_obj.password)
     is_valid = verify_password(form_data.password, user.password)
     if not is_valid:
@@ -122,20 +127,21 @@ async def login_user(form_data):
         "token": access_token["access_token"],
         "creation_date": datetime.datetime.utcnow(),
     }
-    await database.execute(query, values=values)
+    await session.execute(text(query), values)
+
     return access_token
 
 
-async def register_user(user):
+async def register_user(user, session: AsyncSession):
 
-    fetched_user = await find_existed_user(user.email)
+    fetched_user = await find_existed_user(user.email, session)
     if fetched_user:
         return {"status_code": 400, "message": "User already signed up!"}
 
     # Create new user
     user.password = get_password_hash(user.password)
-    await create_user(user)
-    user = await find_existed_user(user.email)
+    await create_user(user, session)
+    user = await find_existed_user(user.email, session)
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = await create_access_token(
         data={"sub": user.email},

@@ -1,3 +1,6 @@
+from sqlalchemy import (
+    exc,
+)
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
@@ -22,6 +25,8 @@ async def get_db_session(
 
     try:  # noqa: WPS501
         yield session
+    except exc.DBAPIError:
+        session.rollback()
     finally:
         await session.commit()
         await session.close()
