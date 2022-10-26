@@ -35,7 +35,7 @@ from app.utils.constants import (
     JWT_SECRET_KEY,
 )
 from app.utils.dependencies import (
-    get_db_session,
+    get_db_transactional_session,
 )
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -72,7 +72,7 @@ async def create_access_token(
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db_transactional_session),
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

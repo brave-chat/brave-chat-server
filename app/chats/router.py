@@ -24,7 +24,8 @@ from app.users.schemas import (
     UserObjectSchema,
 )
 from app.utils.dependencies import (
-    get_db_session,
+    get_db_autocommit_session,
+    get_db_transactional_session,
 )
 from app.utils.jwt_util import (
     get_current_active_user,
@@ -52,7 +53,7 @@ router = APIRouter(prefix="/api/v1")
 async def send_message(
     request: MessageCreate,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Deliver a new message given an authenticated user.
@@ -76,9 +77,12 @@ async def send_message(
 async def get_conversation(
     receiver: str,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_transactional_session),
 ):
     """
     Return all messages grouped by senders for a given receiver.
     """
-    results = await get_sender_receiver_messages(currentUser, receiver)
+    results = await get_sender_receiver_messages(
+        currentUser, receiver, session
+    )
     return results

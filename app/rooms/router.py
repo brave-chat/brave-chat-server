@@ -2,6 +2,9 @@ from fastapi import (
     APIRouter,
     Depends,
 )
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
 
 from app.auth.schemas import (
     ResponseSchema,
@@ -19,6 +22,10 @@ from app.rooms.schemas import (
 )
 from app.users.schemas import (
     UserObjectSchema,
+)
+from app.utils.dependencies import (
+    get_db_autocommit_session,
+    get_db_transactional_session,
 )
 from app.utils.jwt_util import (
     get_current_active_user,
@@ -48,11 +55,12 @@ router = APIRouter(prefix="/api/v1")
 async def create_room(
     room: RoomCreate,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Create or join a room.
     """
-    results = await create_assign_new_room(currentUser.id, room)
+    results = await create_assign_new_room(currentUser.id, room, session)
     return results
 
 
@@ -60,11 +68,12 @@ async def create_room(
 async def get_room_users_conversation(
     room: str,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_transactional_session),
 ):
     """
     Get Room by room name
     """
-    results = await get_room_conversations(room, currentUser.id)
+    results = await get_room_conversations(room, currentUser.id, session)
     return results
 
 
@@ -72,9 +81,10 @@ async def get_room_users_conversation(
 async def send_room_message(
     request: MessageCreateRoom,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Send a new message.
     """
-    results = await send_new_room_message(currentUser, request)
+    results = await send_new_room_message(currentUser, request, session)
     return results

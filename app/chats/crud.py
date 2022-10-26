@@ -13,10 +13,6 @@ from app.auth.crud import (
 from app.chats.schemas import (
     MessageCreate,
 )
-from app.rooms.model import (
-    RoomMembers,
-    Rooms,
-)
 from app.users.schemas import (
     UserObjectSchema,
 )
@@ -118,9 +114,9 @@ async def send_new_message(
 
 
 async def get_sender_receiver_messages(
-    sender: UserObjectSchema, receiver: str, session
+    sender: UserObjectSchema, receiver: str, session: AsyncSession
 ):
-    receiver = await find_existed_user(email=receiver)
+    receiver = await find_existed_user(email=receiver, session=session)
     if not receiver:
         return {
             "status_code": 400,

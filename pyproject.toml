@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "chat-app-backend"
 version = "0.1.0"
-description = "A fully async based backend for the chat application built using FastAPI, SingleStore, databases[aiomysql], pydantic, SQLAlchemy, and Deta."
+description = "A fully async based backend for the chat application built using FastAPI, SingleStore, Pydantic, SQLAlchemy, and Deta."
 authors = ["wiseaidev <business@wiseai.dev>"]
 license = "MIT"
 readme = "README.md"
@@ -33,8 +33,8 @@ uvicorn = {extras = ["standard"], version = "^0.18.3"}
 python-multipart = "^0.0.5"
 deta = "^1.1.0"
 pydantic = {extras = ["email"], version = "^1.9.2"}
-databases = {extras = ["aiomysql"], version = "^0.6.1"}
 SQLAlchemy = "==1.4.41"
+aiomysql = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.1.0"

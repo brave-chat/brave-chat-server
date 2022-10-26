@@ -33,10 +33,7 @@ from app.rooms import (
 from app.users import (
     router as users_router,
 )
-from app.utils.dependencies import (
-    get_db_session,
-)
-from app.utils.session import (
+from app.utils.engine import (
     init_engine_app,
 )
 

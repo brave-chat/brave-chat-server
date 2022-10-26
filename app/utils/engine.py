@@ -29,20 +29,20 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
 
     :param app: fastAPI application.
     """
-    from app.auth.model import (  # noqa: WPS433
+    from app.auth.models import (  # noqa: WPS433
         AccessTokens,
     )
-    from app.chats.model import (  # noqa: WPS433
+    from app.chats.models import (  # noqa: WPS433
         Messages,
     )
-    from app.contacts.model import (  # noqa: WPS433
+    from app.contacts.models import (  # noqa: WPS433
         Contacts,
     )
-    from app.rooms.model import (  # noqa: WPS433
+    from app.rooms.models import (  # noqa: WPS433
         RoomMembers,
         Rooms,
     )
-    from app.users.model import (  # noqa: WPS433
+    from app.users.models import (  # noqa: WPS433
         Users,
     )
     from app.utils.mixins import (  # noqa: WPS433
@@ -63,7 +63,17 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    session_factory = async_scoped_session(
+    # Refer to https://github.com/sqlalchemy/sqlalchemy/discussions/8713 for more info.  # noqa: E501
+    autocommit_engine = engine.execution_options(isolation_level="AUTOCOMMIT")
+    autocommit_session_factory = async_scoped_session(
+        sessionmaker(
+            autocommit_engine,
+            expire_on_commit=False,
+            class_=AsyncSession,
+        ),
+        scopefunc=current_task,
+    )
+    transactional_session_factory = async_scoped_session(
         sessionmaker(
             engine,
             expire_on_commit=False,
@@ -72,4 +82,5 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
         scopefunc=current_task,
     )
     app.state.db_engine = engine
-    app.state.db_session_factory = session_factory
+    app.state.db_transactional_session_factory = transactional_session_factory
+    app.state.db_autocommit_session_factory = autocommit_session_factory

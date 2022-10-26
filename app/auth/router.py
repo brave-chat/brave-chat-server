@@ -23,7 +23,8 @@ from app.auth.schemas import (
     UserSchema,
 )
 from app.utils.dependencies import (
-    get_db_session,
+    get_db_autocommit_session,
+    get_db_transactional_session,
 )
 
 router = APIRouter(prefix="/api/v1")
@@ -46,7 +47,7 @@ router = APIRouter(prefix="/api/v1")
 )
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     access_token = await login_user(form_data, session)
     return access_token
@@ -68,7 +69,8 @@ async def login(
     },
 )
 async def register(
-    user: UserCreate, session: AsyncSession = Depends(get_db_session)
+    user: UserCreate,
+    session: AsyncSession = Depends(get_db_transactional_session),
 ):
     results = await register_user(user, session)
     return results
