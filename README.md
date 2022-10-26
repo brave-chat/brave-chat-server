@@ -7,9 +7,9 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/wiseaidev/fastapi-singlestore-backend/main.svg)](https://results.pre-commit.ci/latest/github/wiseaidev/fastapi-singlestore-backend/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[![Architecture](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/d9p2lg3ccd3lt7ij0zma.jpg)](https://github.com/wiseaidev/fastapi-singlestore-backend)
+[![Architecture](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/32lsb1pwom7ch3yx0yxi.jpg)](https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-A fully async based backend for the [chat application](https://github.com/wiseaidev/chat) built using FastAPI,Pydantic, SQLAlchemy, Redis, SingleStore, and Deta.
+A Fully Async based backend for the [chat application](https://github.com/wiseaidev/chat) built using FastAPI, Pydantic, SQLAlchemy, AIOmysql, Redis, SingleStore, and Deta.
 
 ## Development Requirements
 
