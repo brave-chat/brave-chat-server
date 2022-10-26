@@ -69,7 +69,27 @@ SINGLESTORE_PORT=3306
 SINGLESTORE_DATABASE=<database name>
 ```
 
-### 6. Generate a secret key
+### 6. Setup a Redis account
+
+You can refer to [this tutorial](https://redis.info/try-free-dev-to) to create a Redis account.
+
+### 7. Set your Redis Cloud Credentials
+
+Set the following environment variables in your .env file according to your account credentials:
+
+```yaml
+# REDIS
+# USER IN REDIS CLOUD
+REDIS_USERNAME=default
+# DATABASE PASSWORD
+REDIS_PASSWORD=<database password>
+# REDIS HOST
+REDIS_HOST=<redis url>
+# REDIS PORT
+REDIS_PORT=15065
+```
+
+### 8. Generate a secret key
 
 Generate a secret key using openssl and update its env var in .env file.
 
@@ -84,7 +104,7 @@ JWT_SECRET_KEY=afa1639545d53ecf83c9f8acf4704abe1382f9a9dbf76d2fd229d4795a4748712
 DEBUG=False
 ```
 
-### 7. Run Localhost
+### 9. Run Localhost
 
 ```sh
 $ make run
