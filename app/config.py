@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     SINGLESTORE_DATABASE: str = os.getenv("SINGLESTORE_DATABASE")
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     DEBUG: bool = os.getenv("DEBUG")
-    engine: Any
 
     class Config:
         env_file = ".env"
@@ -29,7 +28,6 @@ class Settings(BaseSettings):
 
         :return: database URL.
         """
-
         if self.DEBUG:
             SQLALCHEMY_DATABASE_URL = (
                 "mysql+aiomysql://"
