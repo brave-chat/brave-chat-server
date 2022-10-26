@@ -196,7 +196,7 @@ async def get_room_conversations(
 
 
 async def send_new_room_message(
-    sender: UserObjectSchema, request: MessageCreateRoom, session: AsyncSession
+    sender_id: int, request: MessageCreateRoom, session: AsyncSession
 ):
     # Check for empty message
     if not request.content:
@@ -210,7 +210,7 @@ async def send_new_room_message(
             "status_code": 400,
             "message": "You can't send a message to a non existing room!",
         }
-    user = await find_existed_user_in_room(sender.id, room.id, session)
+    user = await find_existed_user_in_room(sender_id, room.id, session)
     if not user:
         logger.info(f"`{user.id}` can't send a message to this room!")
         results = {
@@ -221,6 +221,6 @@ async def send_new_room_message(
     else:
         # create a new message
         results = await send_new_message(
-            sender, request, None, room.id, session
+            sender_id, request, None, room.id, session
         )
     return results

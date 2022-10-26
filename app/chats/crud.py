@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 async def send_new_message(
-    sender: UserObjectSchema,
+    sender_id: int,
     request: MessageCreate,
     file,
     room_id: int,
@@ -47,7 +47,7 @@ async def send_new_message(
                     "message": "You can't send a message to a non existing"
                     " user!",
                 }
-            if receiver.id == sender.id:
+            if receiver.id == sender_id:
                 return {
                     "status_code": 400,
                     "message": "You can't send a message to yourself!",
@@ -71,7 +71,7 @@ async def send_new_message(
                 )
             """
             values = {
-                "sender": sender.id,
+                "sender": sender_id,
                 "receiver": receiver.id,
                 "content": request.content,
                 "message_type": request.message_type,
@@ -98,7 +98,7 @@ async def send_new_message(
                 )
             """
             values = {
-                "sender": sender.id,
+                "sender": sender_id,
                 "room": room_id,
                 "content": request.content,
                 "message_type": request.message_type,

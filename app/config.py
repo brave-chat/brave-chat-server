@@ -1,3 +1,6 @@
+from aioredis import (
+    from_url,
+)
 import os
 from pydantic import (
     BaseSettings,
@@ -9,6 +12,10 @@ from typing import (
 
 class Settings(BaseSettings):
 
+    REDIS_HOST: str = os.getenv("REDIS_HOST")
+    REDIS_PORT: str = os.getenv("REDIS_PORT")
+    REDIS_USERNAME: str = os.getenv("REDIS_USERNAME")
+    REDIS_PASSWORD: str = os.getenv("REDIS_PASSWORD")
     SINGLESTORE_HOST: str = os.getenv("SINGLESTORE_HOST")
     SINGLESTORE_PORT: str = os.getenv("SINGLESTORE_PORT")
     SINGLESTORE_USERNAME: str = os.getenv("SINGLESTORE_USERNAME")
@@ -56,6 +63,26 @@ class Settings(BaseSettings):
                 + self.SINGLESTORE_DATABASE
             )
         return SQLALCHEMY_DATABASE_URL
+
+    async def redis_conn(self) -> str:
+        """
+        Assemble database URL from self.
+
+        :return: database URL.
+        """
+        return await from_url(
+            "redis://"
+            + self.REDIS_USERNAME
+            + ":"
+            + self.REDIS_PASSWORD
+            + "@"
+            + self.REDIS_HOST
+            + ":"
+            + self.REDIS_PORT
+            + "/"
+            "0",
+            decode_responses=True,
+        )
 
 
 settings = Settings()

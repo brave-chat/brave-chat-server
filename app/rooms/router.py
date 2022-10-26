@@ -86,5 +86,5 @@ async def send_room_message(
     """
     Send a new message.
     """
-    results = await send_new_room_message(currentUser, request, session)
+    results = await send_new_room_message(currentUser.id, request, session)
     return results
