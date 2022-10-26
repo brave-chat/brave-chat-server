@@ -2,6 +2,9 @@ from fastapi import (
     APIRouter,
     Depends,
 )
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
 from typing import (
     Union,
 )
@@ -15,15 +18,16 @@ from app.contacts.crud import (
     get_user_contacts,
     search_user_contacts,
 )
-from app.contacts.model import (
-    Contacts,
-)
 from app.contacts.schemas import (
     AddContact,
     GetAllContactsResults,
 )
 from app.users.schemas import (
     UserObjectSchema,
+)
+from app.utils.dependencies import (
+    get_db_autocommit_session,
+    get_db_transactional_session,
 )
 from app.utils.jwt_util import (
     get_current_active_user,
@@ -53,33 +57,15 @@ router = APIRouter(prefix="/api/v1")
 async def add_contact(
     contact: AddContact,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Add new contact to an authenticated user contacts list.
     """
-    results = await create_new_contact(contact.contact, currentUser.id)
+    results = await create_new_contact(
+        contact.contact, currentUser.id, session
+    )
     return results
-
-
-# @router.get(
-#     "/contact",
-#     status_code=200,
-#     response_model=Union[GetAllContactsResults, ResponseSchema],
-#     name="contacts:get-all-contacts",
-#     responses={
-#         200: {
-#             "description": "A list of contacts for each user.",
-#         },
-#     },
-# )
-# async def get_all_contacts(
-#     currentUser: UserObjectSchema = Depends(get_current_active_user),
-# ):
-#     """
-#     Get all contacts grouped by users.
-#     """
-#     results = await get_contacts()
-#     return results
 
 
 @router.get(
@@ -100,11 +86,12 @@ async def add_contact(
 )
 async def get_contacts_user(
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Get all contacts for an authenticated user.
     """
-    results = await get_user_contacts(currentUser.id)
+    results = await get_user_contacts(currentUser.id, session)
     return results
 
 
@@ -127,9 +114,10 @@ async def get_contacts_user(
 async def search_contacts_user(
     search: str,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Search for a contact given an authenticated user.
     """
-    results = await search_user_contacts(search, currentUser.id)
+    results = await search_user_contacts(search, currentUser.id, session)
     return results

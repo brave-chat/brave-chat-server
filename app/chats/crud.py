@@ -1,31 +1,31 @@
 import datetime
 import logging
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
+from sqlalchemy.sql import (
+    text,
+)
 
 from app.auth.crud import (
     find_existed_user,
 )
-from app.chats.model import (
-    Messages,
-)
 from app.chats.schemas import (
     MessageCreate,
 )
-from app.rooms.model import (
-    RoomMembers,
-    Rooms,
-)
 from app.users.schemas import (
     UserObjectSchema,
-)
-from app.utils.session import (
-    database,
 )
 
 logger = logging.getLogger(__name__)
 
 
 async def send_new_message(
-    sender: UserObjectSchema, request: MessageCreate, file, room_id: int
+    sender: UserObjectSchema,
+    request: MessageCreate,
+    file,
+    room_id: int,
+    session: AsyncSession,
 ):
     # Check for empty message
     if isinstance(request, str) and file:
@@ -38,7 +38,9 @@ async def send_new_message(
                     "status_code": 400,
                     "message": "You can't send an empty message!",
                 }
-            receiver = await find_existed_user(email=request.receiver)
+            receiver = await find_existed_user(
+                email=request.receiver, session=session
+            )
             if not receiver:
                 return {
                     "status_code": 400,
@@ -103,7 +105,7 @@ async def send_new_message(
                 "media": request.media,
                 "creation_date": datetime.datetime.utcnow(),
             }
-        await database.execute(query, values=values)
+        await session.execute(text(query), values)
     results = {
         "status_code": 201,
         "message": "A new message has been delivered successfully!",
@@ -112,9 +114,9 @@ async def send_new_message(
 
 
 async def get_sender_receiver_messages(
-    sender: UserObjectSchema, receiver: str
+    sender: UserObjectSchema, receiver: str, session: AsyncSession
 ):
-    receiver = await find_existed_user(email=receiver)
+    receiver = await find_existed_user(email=receiver, session=session)
     if not receiver:
         return {
             "status_code": 400,
@@ -147,7 +149,8 @@ async def get_sender_receiver_messages(
           creation_date
     """
     values = {"sender_id": sender.id, "receiver_id": receiver.id}
-    messages_sent_received = await database.fetch_all(query, values=values)
+    result = await session.execute(text(query), values)
+    messages_sent_received = result.fetchall()
     results = {
         "status_code": 200,
         "result": messages_sent_received,

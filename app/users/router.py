@@ -5,6 +5,9 @@ from fastapi import (
 from fastapi.encoders import (
     jsonable_encoder,
 )
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
 
 from app.auth.crud import (
     find_existed_user,
@@ -15,7 +18,7 @@ from app.auth.schemas import (
 from app.users import (
     crud as user_crud,
 )
-from app.users.model import (
+from app.users.models import (
     Users,
 )
 from app.users.schemas import (
@@ -25,6 +28,10 @@ from app.users.schemas import (
 )
 from app.utils import (
     jwt_util,
+)
+from app.utils.dependencies import (
+    get_db_autocommit_session,
+    get_db_transactional_session,
 )
 
 router = APIRouter(prefix="/api/v1")
@@ -50,13 +57,14 @@ async def get_user_profile(
 async def update_personal_information(
     personal_info: PersonalInfo,
     currentUser: UserObjectSchema = Depends(jwt_util.get_current_active_user),
+    session: AsyncSession = Depends(get_db_transactional_session),
 ):
     currentUser = UserObjectSchema(**jsonable_encoder(currentUser))
     currentUser.first_name = personal_info.first_name
     currentUser.last_name = personal_info.last_name
     currentUser.bio = personal_info.bio
     currentUser.phone_number = personal_info.phone_number
-    await user_crud.update_user_info(currentUser)
+    await user_crud.update_user_info(currentUser, session)
     return {
         "status_code": 200,
         "message": "Your personal information has been updated successfully!",
@@ -67,8 +75,9 @@ async def update_personal_information(
 async def logout(
     token: str = Depends(jwt_util.get_token_user),
     currentUser: Users = Depends(jwt_util.get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
-    await user_crud.set_black_list(token)
+    await user_crud.set_black_list(token, session)
     return {"status": 200, "message": "Good Bye!"}
 
 
@@ -76,18 +85,12 @@ async def logout(
 async def update_user_status(
     request: UpdateStatus,
     currentUser=Depends(jwt_util.get_current_active_user),
+    session: AsyncSession = Depends(get_db_transactional_session),
 ):
     await user_crud.update_chat_status(
-        request.chat_status.lower(), currentUser
+        request.chat_status.lower(), currentUser, session
     )
     return {
         "status_code": 200,
         "message": "Status has been updated successfully!",
     }
-
-
-@router.get("/users/all/get")
-async def get_all_users(currentUser=Depends(jwt_util.get_current_active_user)):
-    # Todo
-    # return await User.find().all()
-    ...

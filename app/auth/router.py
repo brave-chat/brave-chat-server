@@ -5,6 +5,9 @@ from fastapi import (
 from fastapi.security import (
     OAuth2PasswordRequestForm,
 )
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
 from typing import (
     Union,
 )
@@ -18,6 +21,10 @@ from app.auth.schemas import (
     Token,
     UserCreate,
     UserSchema,
+)
+from app.utils.dependencies import (
+    get_db_autocommit_session,
+    get_db_transactional_session,
 )
 
 router = APIRouter(prefix="/api/v1")
@@ -38,8 +45,11 @@ router = APIRouter(prefix="/api/v1")
         401: {"model": ResponseSchema, "description": "Invalid Credentials!"},
     },
 )
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    access_token = await login_user(form_data)
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    access_token = await login_user(form_data, session)
     return access_token
 
 
@@ -58,6 +68,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         },
     },
 )
-async def register(user: UserCreate):
-    results = await register_user(user)
+async def register(
+    user: UserCreate,
+    session: AsyncSession = Depends(get_db_transactional_session),
+):
+    results = await register_user(user, session)
     return results

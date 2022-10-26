@@ -1,5 +1,11 @@
 import datetime
 import logging
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
+from sqlalchemy.sql import (
+    text,
+)
 from typing import (
     Optional,
 )
@@ -16,14 +22,11 @@ from app.chats.schemas import (
 from app.users.schemas import (
     UserObjectSchema,
 )
-from app.utils.session import (
-    database,
-)
 
 logger = logging.getLogger(__name__)
 
 
-async def find_existed_room(room_name: str):
+async def find_existed_room(room_name: str, session: AsyncSession):
     query = """
         SELECT
           *
@@ -33,10 +36,14 @@ async def find_existed_room(room_name: str):
           room_name = :room_name
     """
     values = {"room_name": room_name}
-    return await database.fetch_one(query, values=values)
+
+    result = await session.execute(text(query), values)
+    return result.fetchone()
 
 
-async def find_existed_user_in_room(user_id: int, room_id: int):
+async def find_existed_user_in_room(
+    user_id: int, room_id: int, session: AsyncSession
+):
     query = """
         SELECT
           *
@@ -48,10 +55,12 @@ async def find_existed_user_in_room(user_id: int, room_id: int):
           member = :user_id
     """
     values = {"room_id": room_id, "user_id": user_id}
-    return await database.fetch_one(query, values=values)
+
+    result = await session.execute(text(query), values)
+    return result.fetchone()
 
 
-async def create_room(room_name: int, description: str):
+async def create_room(room_name: int, description: str, session: AsyncSession):
     query = """
         INSERT INTO rooms (
           room_name,
@@ -69,10 +78,12 @@ async def create_room(room_name: int, description: str):
         "description": description,
         "creation_date": datetime.datetime.utcnow(),
     }
-    return await database.fetch_one(query, values=values)
+
+    result = await session.execute(text(query), values)
+    return result.fetchone()
 
 
-async def join_room(user_id: int, room_id: int):
+async def join_room(user_id: int, room_id: int, session: AsyncSession):
     query = """
         INSERT INTO room_members (
           room,
@@ -90,16 +101,25 @@ async def join_room(user_id: int, room_id: int):
         "member": user_id,
         "creation_date": datetime.datetime.utcnow(),
     }
-    return await database.execute(query, values=values)
+
+    return await session.execute(text(query), values)
 
 
-async def create_assign_new_room(user_id: int, room_obj):
-    room = await find_existed_room(room_obj.room_name)
+async def create_assign_new_room(
+    user_id: int, room_obj, session: AsyncSession
+):
+    if not room_obj.room_name:
+        results = {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+        return results
+    room = await find_existed_room(room_obj.room_name, session)
     if not room:
-        await create_room(room_obj.room_name, room_obj.description)
+        await create_room(room_obj.room_name, room_obj.description, session)
         logger.info(f"Creating room `{room_obj.room_name}`.")
-        room = await find_existed_room(room_obj.room_name)
-        user = await find_existed_user_in_room(user_id, room.id)
+        room = await find_existed_room(room_obj.room_name, session)
+        user = await find_existed_user_in_room(user_id, room.id, session)
         if user:
             logger.info(f"`{user_id}` has already joined this room!")
             results = {
@@ -119,8 +139,7 @@ async def create_assign_new_room(user_id: int, room_obj):
         return results
 
     else:
-        user = await find_existed_user_in_room(user_id, room.id)
-        print(user)
+        user = await find_existed_user_in_room(user_id, room.id, session)
         if user:
             logger.info(f"`{user_id}` has already joined this room!")
             results = {
@@ -129,7 +148,7 @@ async def create_assign_new_room(user_id: int, room_obj):
                 f"{room_obj.room_name}!",
             }
         else:
-            await join_room(user_id, room.id)
+            await join_room(user_id, room.id, session)
             logger.info(
                 f"Adding {user_id} to room `{room_obj.room_name}` as a member."
             )
@@ -140,8 +159,10 @@ async def create_assign_new_room(user_id: int, room_obj):
         return results
 
 
-async def get_room_conversations(room_name: str, sender_id: int):
-    room = await find_existed_room(room_name)
+async def get_room_conversations(
+    room_name: str, sender_id: int, session: AsyncSession
+):
+    room = await find_existed_room(room_name, session)
     if not room:
         return {
             "status_code": 400,
@@ -165,7 +186,8 @@ async def get_room_conversations(room_name: str, sender_id: int):
           creation_date
     """
     values = {"room_id": room.id, "sender_id": sender_id}
-    messages_sent_received = await database.fetch_all(query, values=values)
+    result = await session.execute(text(query), values)
+    messages_sent_received = result.fetchall()
     results = {
         "status_code": 200,
         "result": messages_sent_received,
@@ -174,7 +196,7 @@ async def get_room_conversations(room_name: str, sender_id: int):
 
 
 async def send_new_room_message(
-    sender: UserObjectSchema, request: MessageCreateRoom
+    sender: UserObjectSchema, request: MessageCreateRoom, session: AsyncSession
 ):
     # Check for empty message
     if not request.content:
@@ -182,14 +204,14 @@ async def send_new_room_message(
             "status_code": 400,
             "message": "You can't send an empty message!",
         }
-    room = await find_existed_room(request.room)
+    room = await find_existed_room(request.room, session)
     if not room:
         return {
             "status_code": 400,
             "message": "You can't send a message to a non existing room!",
         }
-    user = await find_existed_user_in_room(sender.id, room.id)
-    if user:
+    user = await find_existed_user_in_room(sender.id, room.id, session)
+    if not user:
         logger.info(f"`{user.id}` can't send a message to this room!")
         results = {
             "status_code": 400,
@@ -198,5 +220,7 @@ async def send_new_room_message(
         }
     else:
         # create a new message
-        results = await send_new_message(sender, request, None, room.id)
+        results = await send_new_message(
+            sender, request, None, room.id, session
+        )
     return results

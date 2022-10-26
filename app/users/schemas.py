@@ -7,7 +7,7 @@ from typing import (
     Optional,
 )
 
-from app.users.model import (
+from app.users.models import (
     ChatStatus,
     UserRole,
     UserStatus,

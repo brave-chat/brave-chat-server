@@ -1,27 +1,26 @@
 import datetime
 import logging
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
+from sqlalchemy.sql import (
+    text,
+)
 
 from app.auth.crud import (
     find_existed_user,
 )
-from app.contacts.model import (
-    Contacts,
-)
-from app.users.model import (
-    Users,
-)
 from app.users.schemas import (
     UserObjectSchema,
-)
-from app.utils.session import (
-    database,
 )
 
 logger = logging.getLogger(__name__)
 
 
-async def create_new_contact(contact_email: str, user_id: int):
-    contact = await find_existed_user(email=contact_email)
+async def create_new_contact(
+    contact_email: str, user_id: int, session: AsyncSession
+):
+    contact = await find_existed_user(email=contact_email, session=session)
     if not contact:
         return {
             "status_code": 400,
@@ -44,7 +43,8 @@ async def create_new_contact(contact_email: str, user_id: int):
           contact = :contact_id
     """
     values = {"user_id": user_id, "contact_id": contact.id}
-    found_contact = await database.fetch_one(query, values=values)
+    result = await session.execute(text(query), values)
+    found_contact = result.fetchone()
     if found_contact:
         return {
             "status_code": 400,
@@ -69,7 +69,8 @@ async def create_new_contact(contact_email: str, user_id: int):
         "contact_id": contact.id,
         "creation_date": datetime.datetime.utcnow(),
     }
-    await database.execute(query, values=values)
+
+    await session.execute(text(query), values)
     results = {
         "status_code": 201,
         "message": f"{contact.first_name} has been added to your contact"
@@ -78,7 +79,7 @@ async def create_new_contact(contact_email: str, user_id: int):
     return results
 
 
-async def get_contacts():
+async def get_contacts(session: AsyncSession):
     # get all contacts for each user.
     query = """
         SELECT
@@ -92,7 +93,9 @@ async def get_contacts():
         GROUP BY
           contacts.id
     """
-    contacts = await database.fetch_all(query)
+    values = {}
+    result = await session.execute(text(query), values)
+    contacts = result.fetchall()
     results = {
         "status_code": 200,
         "result": contacts,
@@ -100,14 +103,15 @@ async def get_contacts():
     return results
 
 
-async def find_existed_user_contact(user_id: int):
+async def find_existed_user_contact(user_id: int, session: AsyncSession):
     query = "SELECT * FROM contacts WHERE user=:user_id"
     values = {"user_id": user_id}
-    return await database.fetch_one(query, values=values)
+    result = await session.execute(text(query), values)
+    return result.fetchone()
 
 
-async def get_user_contacts(user_id: int):
-    user = await find_existed_user_contact(user_id)
+async def get_user_contacts(user_id: int, session: AsyncSession):
+    user = await find_existed_user_contact(user_id, session)
     if user:
         # get all contacts for each user.
         query = """
@@ -123,16 +127,20 @@ async def get_user_contacts(user_id: int):
               contacts.user= :user_id
         """
         values = {"user_id": user_id}
-        contacts = await database.fetch_all(query, values=values)
+
+        result = await session.execute(text(query), values)
+        contacts = result.fetchall()
         results = {"status_code": 200, "result": contacts}
         return results
     return {"status_code": 400, "message": "User not found!"}
 
 
-async def search_user_contacts(search: str, user_id: int):
-    search = search.lower()
-    user = await find_existed_user_contact(user_id)
+async def search_user_contacts(
+    search: str, user_id: int, session: AsyncSession
+):
+    user = await find_existed_user_contact(user_id, session)
     if user:
+        # TODO: CONCAT(*, :search, *)
         query = """
             SELECT
               *
@@ -151,11 +159,12 @@ async def search_user_contacts(search: str, user_id: int):
                 email
               )
               AGAINST (
-                :search
+                  :search
               )
         """
         values = {"user_id": user_id, "search": search}
-        return_results = await database.fetch_all(query, values=values)
+        result = await session.execute(text(query), values)
+        return_results = result.fetchall()
         results = {"status_code": 200, "result": return_results}
         return results
     return {"status_code": 400, "message": "User not found!"}
