@@ -58,7 +58,9 @@ async def send_message(
     """
     Deliver a new message given an authenticated user.
     """
-    results = await send_new_message(currentUser, request, None, None, session)
+    results = await send_new_message(
+        currentUser.id, request, None, None, session
+    )
     return results
 
 

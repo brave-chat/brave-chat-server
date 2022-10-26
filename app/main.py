@@ -36,6 +36,9 @@ from app.users import (
 from app.utils.engine import (
     init_engine_app,
 )
+from app.web_sockets import (
+    router as web_sockets_router,
+)
 
 logger = logging.getLogger(__name__)
 # change this if in production
@@ -102,6 +105,7 @@ chat_app.include_router(users_router.router, tags=["User"])
 chat_app.include_router(contacts_router.router, tags=["Contact"])
 chat_app.include_router(chats_router.router, tags=["Chat"])
 chat_app.include_router(rooms_router.router, tags=["Room"])
+chat_app.include_router(web_sockets_router.router, tags=["Socket"])
 
 
 def serve() -> None:

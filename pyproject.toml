@@ -35,6 +35,7 @@ deta = "^1.1.0"
 pydantic = {extras = ["email"], version = "^1.9.2"}
 SQLAlchemy = "==1.4.41"
 aiomysql = "^0.1.1"
+aioredis = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.1.0"
