@@ -6,6 +6,11 @@ from fastapi.middleware.cors import (
     CORSMiddleware,
 )
 import logging
+import os
+from prometheus_fastapi_instrumentator import (
+    Instrumentator,
+)
+import shutil
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
@@ -22,7 +27,7 @@ from app.chats import (
     router as chats_router,
 )
 from app.config import (
-    Settings,
+    settings,
 )
 from app.contacts import (
     router as contacts_router,
@@ -40,9 +45,59 @@ from app.web_sockets import (
     router as web_sockets_router,
 )
 
+
+def setup_prometheus(app: FastAPI) -> None:  # pragma: no cover
+    """
+    Enables prometheus integration.
+
+    :param app: current application.
+    """
+    instrumentator = Instrumentator(
+        should_group_status_codes=False,
+        should_ignore_untemplated=True,
+        # should_respect_env_var=True,
+        should_instrument_requests_inprogress=True,
+        excluded_handlers=[".*admin.*", "/metrics"],
+        # env_var_name="ENABLE_METRICS",
+        inprogress_name="inprogress",
+        inprogress_labels=True,
+    )
+    instrumentator.instrument(app).expose(
+        app,
+        should_gzip=True,
+        name="prometheus_metrics",
+        include_in_schema=False,
+    )
+
+
+def set_multiproc_dir() -> None:
+    """
+    Sets mutiproc_dir env variable.
+
+    This function cleans up the multiprocess directory
+    and recreates it. This actions are required by prometheus-client
+    to share metrics between processes.
+
+    After cleanup, it sets two variables.
+    Uppercase and lowercase because different
+    versions of the prometheus-client library
+    depend on different environment variables,
+    so I've decided to export all needed variables,
+    to avoid undefined behaviour.
+    """
+    shutil.rmtree(settings.prometheus_dir, ignore_errors=True)
+    os.makedirs(settings.prometheus_dir, exist_ok=True)
+    os.environ["prometheus_multiproc_dir"] = str(
+        settings.prometheus_dir.expanduser().absolute(),
+    )
+    os.environ["PROMETHEUS_MULTIPROC_DIR"] = str(
+        settings.prometheus_dir.expanduser().absolute(),
+    )
+
+
 logger = logging.getLogger(__name__)
 # change this if in production
-if not Settings().DEBUG:
+if not settings.DEBUG:
     chat_app = FastAPI(
         docs_url="/docs",
         redoc_url="/redocs",
@@ -88,6 +143,7 @@ async def add_process_time_header(request: Request, call_next):
 @chat_app.on_event("startup")
 async def startup():
     await init_engine_app(chat_app)
+    setup_prometheus(chat_app)
 
 
 @chat_app.on_event("shutdown")
@@ -110,6 +166,7 @@ chat_app.include_router(web_sockets_router.router, tags=["Socket"])
 
 def serve() -> None:
     try:
+        set_multiproc_dir()
         uvicorn.run(
             "app.main:chat_app",
             host="0.0.0.0",
@@ -117,6 +174,7 @@ def serve() -> None:
             port=8000,
             reload=True,
             debug=True,
+            log_level="debug",
         )
     except Exception as e:
         print(e)

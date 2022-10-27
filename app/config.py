@@ -2,12 +2,20 @@ from aioredis import (
     from_url,
 )
 import os
+from pathlib import (
+    Path,
+)
 from pydantic import (
     BaseSettings,
+)
+from tempfile import (
+    gettempdir,
 )
 from typing import (
     Any,
 )
+
+TEMP_DIR = Path(gettempdir())
 
 
 class Settings(BaseSettings):
@@ -23,6 +31,10 @@ class Settings(BaseSettings):
     SINGLESTORE_DATABASE: str = os.getenv("SINGLESTORE_DATABASE")
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     DEBUG: bool = os.getenv("DEBUG")
+
+    # This variable is used to define
+    # multiproc_dir. It's required for [uvi|guni]corn projects.
+    prometheus_dir: Path = TEMP_DIR / "prom"
 
     class Config:
         env_file = ".env"

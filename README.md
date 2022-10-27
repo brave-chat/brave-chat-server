@@ -9,15 +9,96 @@
 
 [![Architecture](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/32lsb1pwom7ch3yx0yxi.jpg)](https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-A Fully Async based backend for the [chat application](https://github.com/wiseaidev/chat) built using FastAPI, Pydantic, SQLAlchemy, AIOmysql, Redis, SingleStore, and Deta.
+A Fully Async based backend for the [react chat application](https://github.com/wiseaidev/chat).
+
+## Table of Contents
+
+- [Development Requirements](#development-requirements)
+- [Project Structure](#project-structure)
+- [Installation with Make](#installation-with-make)
+  - [1. Create a virtualenv](#1-create-a-virtualenv)
+  - [2. Activate the virtualenv](#2-activate-the-virtualenv)
+  - [3. Install dependencies](#3-install-dependencies)
+  - [4. Setup a SingleStore account](#4-setup-a-singlestore-account)
+  - [5. Set your SingleStore Credentials](#5-set-your-singlestore-credentials)
+  - [6. Setup a Redis account](#6-setup-a-redis-account)
+  - [7. Set your Redis Cloud Credentials](#7-set-your-redis-cloud-credentials)
+  - [8. Generate a secret key](#8-generate-a-secret-key)
+  - [9. Run Localhost](#9-run-localhost)
+- [Access Swagger Documentation](#access-swagger-documentation)
+- [Access Redocs Documentation](#access-redocs-documentation)
+- [Access Prometheus Metrics](#access-prometheus-metrics)
+- [Deployment](#deployment)
+  - [Deta Micros](#deta-micros)
+  - [Using The CLI with make](#using-the-cli-with-make)
+  - [Heroku](#heroku)
+  - [Vercel](#vercel)
+  - [Netlify(Not Possible)](#netlifynot-possible)
+- [Core Dependencies](#core-dependencies)
+- [License](#license)
 
 ## Development Requirements
 
-- A Debian Distro
-- Python (3.9)
-- Poetry (1.2.2)
+- Make (GNU command)
+- Python (>= 3.8)
+- Poetry (1.2)
 
-## Installation with make
+## Project Structure
+
+<details>
+<summary><code>❯ tree app</code></summary>
+
+```sh
+.
+├── auth     # Package contains different config files for the `auth` app.
+│   ├── crud.py     # Module contains different CRUD operations performed on the database.
+│   ├── models.py     # Module contains different data models for ORM to interact with database.
+│   ├── router.py     # Module contains different routes for this api.
+│   └── schemas.py     # Module contains different schemas for this api for validation purposes.
+├── chats     # Package contains different config files for the `chats` app.
+│   ├── crud.py     # Module contains different CRUD operations performed on the database.
+│   ├── models.py     # Module contains different data models for ORM to interact with database.
+│   ├── router.py     # Module contains different routes for this api.
+│   └── schemas.py     # Module contains different schemas for this api for validation purposes.
+├── config.py     # Module contains the main configuration settings for project.
+├── contacts     # Package contains different config files for the `contacts` app.
+│   ├── crud.py     # Module contains different CRUD operations performed on the database.
+│   ├── models.py     # Module contains different data models for ORM to interact with the database.
+│   ├── router.py     # Module contains different routes for this api.
+│   └── schemas.py     # Module contains different schemas for this api for validation purposes.
+├── __init__.py
+├── main.py     # Startup script. Starts uvicorn.
+├── rooms     # Package contains different config files for the `rooms` app.
+│   ├── crud.py     # Module contains different CRUD operations performed on the database.
+│   ├── models.py     # Module contains different models for ORMs to inteact with database..
+│   ├── router.py     # Module contains different routes for this api.
+│   └── schemas.py     # Module contains different schemas for this api for validation purposes.
+├── users     # Package contains different config files for the `users` app.
+│   ├── crud.py     # Module contains different CRUD operations performed on the database.
+│   ├── models.py     # Module contains different models for ORMs to inteact with database..
+│   ├── router.py     # Module contains different routes for this api.
+│   └── schemas.py     # Module contains different schemas for this api for validation purposes.
+├── utils     # Package contains different common utility modules for the whole project.
+│   ├── constants.py
+│   ├── crypt_util.py
+│   ├── db_utils.py     # A utility script that create, drop a test database used in the tests package.
+│   ├── dependencies.py     # A utility script that yield a session for each request to make the crud call work.
+│   ├── engine.py     # A utility script that initialize two sqlalchemy engines and set them as app state variables.
+│   ├── full_text_search.py     # A utility script to make sqlalchemy and singlestore compatible for implementing full text search on a given table.
+│   ├── jwt_util.py     # A utility script for JWT.
+│   ├── mixins.py     # A utility script that contains common mixins for different models.
+│   └── pub_sub_handlers.py     # A utility script that contains publishers and consumers handlers for the redis queue.
+└── web_sockets     # Package contains different config files for the `web_sockets` app.
+    └── router.py     # Module contains different routes for the websockets.
+```
+
+</details>
+
+## Installation with Make
+
+The best way to configure, install main dependencies, and run the project is by using `make`. So, make sure you have `make` installed and configured on your machine. If it is not the case, head over to [this thread](https://stackoverflow.com/questions/32127524/how-to-install-and-use-make-in-windows) on stackoverflow to install it on windows, or [this thread](https://stackoverflow.com/questions/11494522/installing-make-on-mac) to install it on Mac OS.
+
+Having `make` installed and configured on your machine, you can now run `make` under the root directory of this project to explore different available commands to run:
 
 ```sh
 $ make
@@ -51,6 +132,8 @@ $ source .venv/bin/activate
 ```sh
 $ make install
 ```
+
+**Note**: _This command will automatically generate a `.env` file from `.env.example`, uninstall the old version of poetry on your machine, then install latest version `1.2.2`, and install the required main dependencies._
 
 ### 4. Setup a SingleStore account
 
@@ -118,6 +201,10 @@ $ make run
 
 > <http://localhost:8000/redocs>
 
+## Access Prometheus Metrics
+
+> <http://localhost:8000/metrics>
+
 ## Deployment
 
 To use the deta version of the API you'll need to create a Deta account.
@@ -164,10 +251,35 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 ### Vercel
 
+This project makes use of WebSockets, which are unforunately not supported by Vercel's serverless functions.
+
 [![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend&env=JWT_SECRET_KEY,SINGLESTORE_USERNAME,SINGLESTORE_PASSWORD,SINGLESTORE_HOST,SINGLESTORE_PORT,SINGLESTORE_DATABASE&envDescription=Your%20SingleStoreDB%20Account%2C%20Credentials%20and%20JWT_SECRET_KEY%20)
 
-### Netlify
+### Netlify(Not Possible)
 
-Running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is currently allowed on Netlify, which means that you can only deploy statically generated websites like docs and such. I tried to hack my way around it by creating a serverless function that executes `uvicorn main:app --reload` in the background. However, the serverless function is being deployed on a different environment.
+This project makes use of WebSockets, which are unforunately not supported by Netlify's serverless functions.
+
+Additionally, running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is currently allowed on Netlify, which means that you can only deploy statically generated websites like docs and such. I tried to hack my way around it by creating a serverless function that executes `uvicorn main:app --reload` in the background. However, the serverless function is being deployed on a different environment.
 
 [![Deploy on Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/wiseaidev/fastapi-singlestore-backend)
+
+## Core Dependencies
+
+The following packages are the main dependencies used to build this project:
+
+- [`python`](https://github.com/python/cpython)
+- [`fastapi`](https://github.com/tiangolo/fastapi)
+- [`uvicorn`](https://github.com/encode/uvicorn)
+- [`pydantic`](https://github.com/pydantic/pydantic)
+- [`SQLAlchemy`](https://github.com/sqlalchemy/sqlalchemy)
+- [`PyJWT`](https://github.com/jpadilla/pyjwt)
+- [`passlib`](https://passlib.readthedocs.io/en/stable/index.html)
+- [`aiomysql`](https://github.com/aio-libs/aiomysql)
+- [`aioredis`](https://github.com/aio-libs/aioredis-py)
+- [`python-multipart`](https://github.com/andrew-d/python-multipart)
+- [`deta-python`](https://github.com/deta/deta-python)
+- [`prometheus-fastapi-instrumentator`](https://github.com/trallnag/prometheus-fastapi-instrumentator)
+
+## License
+
+This project and the accompanying materials are made available under the terms and conditions of the [`MIT LICENSE`](https://github.com/wiseaidev/fastapi-singlestore-backend/blob/main/LICENSE).
