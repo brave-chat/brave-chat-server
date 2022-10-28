@@ -23,9 +23,9 @@ class UserObjectSchema(BaseModel):
     bio: Optional[str] = Field(
         ..., example="A blazingly fast full stack developer."
     )
-    chat_status: Optional[ChatStatus] = Field(..., example=ChatStatus.online)
-    user_status: UserStatus = Field(..., example=UserStatus.active)
-    user_role: Optional[UserRole] = Field(..., example=UserRole.regular)
+    chat_status: Optional[str] = Field(..., example=ChatStatus.online)
+    user_status: str = Field(..., example=UserStatus.active)
+    user_role: Optional[str] = Field(..., example=UserRole.regular)
     profile_picture: Optional[str] = Field(..., example="https://wiseai.dev")
 
 

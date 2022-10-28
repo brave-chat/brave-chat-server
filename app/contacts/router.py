@@ -14,6 +14,7 @@ from app.auth.schemas import (
 )
 from app.contacts.crud import (
     create_new_contact,
+    delete_contact_user,
     get_contacts,
     get_user_contacts,
     search_user_contacts,
@@ -97,7 +98,6 @@ async def get_contacts_user(
 
 @router.get(
     "/contacts/users/search",
-    response_model=Union[GetAllContactsResults, ResponseSchema],
     status_code=200,
     name="contacts:search-for-contact",
     responses={
@@ -107,7 +107,8 @@ async def get_contacts_user(
         },
         400: {
             "model": ResponseSchema,
-            "description": "User not found.",
+            "description": "User can't search against an empty string, or"
+            " User not found.",
         },
     },
 )
@@ -120,4 +121,35 @@ async def search_contacts_user(
     Search for a contact given an authenticated user.
     """
     results = await search_user_contacts(search, currentUser.id, session)
+    return results
+
+
+@router.delete(
+    "/contact/delete",
+    status_code=200,
+    name="contacts:delete-contact",
+    responses={
+        200: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates a user"
+            " has deleted a contact.",
+        },
+        400: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates if a user"
+            " can't delete a non existing contact.",
+        },
+    },
+)
+async def delete_user_contact(
+    contact: AddContact,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    """
+    delete a contact.
+    """
+    results = await delete_contact_user(
+        contact.contact, currentUser.id, session
+    )
     return results

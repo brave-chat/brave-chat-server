@@ -113,6 +113,52 @@ async def send_new_message(
     return results
 
 
+async def delete_room_messages(
+    sender_id: int,
+    room_id: int,
+    session: AsyncSession,
+):
+
+    query = """
+        SELECT
+            *
+        FROM
+            messages
+        WHERE
+          sender = :sender_id
+        AND
+          room = :room_id
+    """
+    values = {"sender_id": sender_id, "room_id": room_id}
+    result = await session.execute(text(query), values)
+    messages = result.fetchall()
+    if not messages:
+        return {
+            "status_code": 400,
+            "message": "There is no message to delete!",
+        }
+    else:
+        query = """
+            DELETE
+            FROM
+              messages
+            WHERE
+              sender = :sender_id
+            AND
+              room = :room_id
+        """
+        values = {"sender_id": sender_id, "room_id": room_id}
+
+        await session.execute(text(query), values)
+
+        results = {
+            "status_code": 200,
+            "message": "Your messages have been deleted successfully!",
+        }
+
+    return results
+
+
 async def get_sender_receiver_messages(
     sender: UserObjectSchema, receiver: str, session: AsyncSession
 ):

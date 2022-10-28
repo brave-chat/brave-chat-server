@@ -45,7 +45,7 @@ from app.utils.engine import (
 )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def anyio_backend() -> str:
     """
     Backend for anyio pytest plugin.
@@ -55,7 +55,7 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 async def _engine() -> AsyncGenerator[AsyncEngine, None]:
     """
     Create engine and databases.
@@ -109,6 +109,12 @@ async def _engine() -> AsyncGenerator[AsyncEngine, None]:
             text(
                 "INSERT INTO users (first_name, last_name, email, password, user_status)"  # noqa: E501
                 f" VALUES ('test', 'user', 'test@example.com','{get_password_hash('test')}', 1);",  # noqa: E501
+            )
+        )
+        await conn.execute(
+            text(
+                "INSERT INTO users (first_name, last_name, email, password, user_status)"  # noqa: E501
+                f" VALUES ('test1', 'user1', 'test1@example.com','{get_password_hash('test')}', 1);",  # noqa: E501
             )
         )
 
@@ -214,7 +220,7 @@ async def client(
         yield acc
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def token(fastapi_app: FastAPI, client: AsyncClient) -> str:
     email = "test@example.com"
     password = "test"

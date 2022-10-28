@@ -54,13 +54,14 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
         pool_pre_ping=True,
         pool_size=30,
         max_overflow=30,
-        echo_pool=True,
+        # echo_pool=True,
         future=True,
-        echo=True,
+        # echo=True,
         pool_recycle=3600,
     )  # recycle every hour
 
     async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     # Refer to https://github.com/sqlalchemy/sqlalchemy/discussions/8713 for more info.  # noqa: E501
