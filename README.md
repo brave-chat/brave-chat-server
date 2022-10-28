@@ -270,7 +270,7 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 This project makes use of WebSockets, which are unforunately not supported by Vercel's serverless functions.
 
-[![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend&env=JWT_SECRET_KEY,SINGLESTORE_USERNAME,SINGLESTORE_PASSWORD,SINGLESTORE_HOST,SINGLESTORE_PORT,SINGLESTORE_DATABASE&envDescription=Your%20SingleStoreDB%20Account%2C%20Credentials%20and%20JWT_SECRET_KEY%20)
+[![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
 
 ### Netlify(Not Possible)
 

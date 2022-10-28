@@ -32,6 +32,24 @@
       "description": "The name of the database you want to access, in our case, the `chat` database.",
       "value": "chat",
       "required": false
+    },
+    "REDIS_USERNAME": {
+      "description": "Your Redis account username. `default` is the default username.",
+      "value": "default",
+      "required": false
+    },
+    "REDIS_PASSWORD": {
+      "description": "Your Redis account password.",
+      "required": true
+    },
+    "REDIS_HOST": {
+      "description": "Your Redis url to the node to connect.",
+      "required": true
+    },
+    "REDIS_PORT": {
+      "description": "Your Redis node exposed port number. `15065` is the default.",
+      "value": "15065",
+      "required": false
     }
   },
   "formation": {

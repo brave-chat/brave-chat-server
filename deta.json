@@ -37,6 +37,28 @@
       "key": "JWT_SECRET_KEY",
       "description": "Secret used to sign the JWTs",
       "required": true
+    },
+    {
+      "key": "REDIS_USERNAME",
+      "description": "Your Redis account username. `default` is the default username.",
+      "value": "default",
+      "required": false
+    },
+    {
+      "key": "REDIS_PASSWORD",
+      "description": "Your Redis account password.",
+      "required": true
+    },
+    {
+      "key": "REDIS_HOST",
+      "description": "Your Redis url to the node to connect.",
+      "required": true
+    },
+    {
+      "key": "REDIS_PORT",
+      "description": "Your Redis node exposed port number. `15065` is the default.",
+      "value": "15065",
+      "required": false
     }
   ]
 }

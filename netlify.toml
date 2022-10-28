@@ -4,6 +4,10 @@
   status = 200
 
 [template.environment]
+  REDIS_USERNAME="Your REDIS Account Username"
+  REDIS_PASSWORD="Your REDIS Account password"
+  REDIS_HOST="Your REDIS url to the node"
+  REDIS_PORT="Your REDIS Port Number"
   SINGLESTORE_USERNAME = "Your SingleStoreDB Account Username"
   SINGLESTORE_PASSWORD = "Your SingleStoreDB Account Password"
   SINGLESTORE_HOST = "Your SingleStoreDB Host Url"
