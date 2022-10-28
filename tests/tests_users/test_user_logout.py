@@ -14,7 +14,6 @@ from starlette.status import (
 
 
 @pytest.mark.anyio
-@pytest.mark.skip(reason="Weird SQLAlchemy behaviour")
 async def test_user_successfull_logout(
     fastapi_app: FastAPI, client: AsyncClient, token: str
 ) -> None:

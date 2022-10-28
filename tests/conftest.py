@@ -45,7 +45,7 @@ from app.utils.engine import (
 )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def anyio_backend() -> str:
     """
     Backend for anyio pytest plugin.
@@ -55,7 +55,7 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 async def _engine() -> AsyncGenerator[AsyncEngine, None]:
     """
     Create engine and databases.

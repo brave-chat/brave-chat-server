@@ -25,4 +25,5 @@ async def test_get_contact_list(
         },
     )
     dict_response = json.loads(response.content.decode())
+    assert dict_response["status_code"] == HTTP_200_OK
     assert len(dict_response["result"]) == 1
