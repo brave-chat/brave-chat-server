@@ -7,8 +7,15 @@ from fastapi.middleware.cors import (
 )
 import logging
 import os
+from prometheus_client import (
+    Counter,
+)
 from prometheus_fastapi_instrumentator import (
     Instrumentator,
+    metrics,
+)
+from prometheus_fastapi_instrumentator.metrics import (
+    Info,
 )
 import shutil
 from sqlalchemy.ext.asyncio import (
@@ -18,6 +25,9 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 import time
+from typing import (
+    Callable,
+)
 import uvicorn
 
 from app.auth import (
@@ -46,6 +56,25 @@ from app.web_sockets import (
 )
 
 
+def http_requested_languages_total() -> Callable[[Info], None]:
+    METRIC = Counter(
+        "http_requested_languages_total",
+        "Number of times a certain language has been requested.",
+        labelnames=("langs",),
+    )
+
+    def instrumentation(info: Info) -> None:
+        langs = set()
+        lang_str = info.request.headers["Accept-Language"]
+        for element in lang_str.split(","):
+            element = element.split(";")[0].strip().lower()
+            langs.add(element)
+        for language in langs:
+            METRIC.labels(language).inc()
+
+    return instrumentation
+
+
 def setup_prometheus(app: FastAPI) -> None:  # pragma: no cover
     """
     Enables prometheus integration.
@@ -57,7 +86,7 @@ def setup_prometheus(app: FastAPI) -> None:  # pragma: no cover
         should_ignore_untemplated=True,
         # should_respect_env_var=True,
         should_instrument_requests_inprogress=True,
-        excluded_handlers=[".*admin.*", "/metrics"],
+        # excluded_handlers=[".*admin.*", "/metrics"],
         # env_var_name="ENABLE_METRICS",
         inprogress_name="inprogress",
         inprogress_labels=True,
@@ -67,6 +96,24 @@ def setup_prometheus(app: FastAPI) -> None:  # pragma: no cover
         should_gzip=True,
         name="prometheus_metrics",
         include_in_schema=False,
+    )
+    instrumentator.add(http_requested_languages_total())
+    instrumentator.add(
+        metrics.request_size(
+            should_include_handler=True,
+            should_include_method=False,
+            should_include_status=True,
+            metric_namespace="a",
+            metric_subsystem="b",
+        )
+    ).add(
+        metrics.response_size(
+            should_include_handler=True,
+            should_include_method=False,
+            should_include_status=True,
+            metric_namespace="namespace",
+            metric_subsystem="subsystem",
+        )
     )
 
 

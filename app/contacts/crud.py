@@ -79,6 +79,59 @@ async def create_new_contact(
     return results
 
 
+async def delete_contact_user(
+    contact_email: str, user_id: int, session: AsyncSession
+):
+    contact = await find_existed_user(email=contact_email, session=session)
+    if not contact:
+        return {
+            "status_code": 400,
+            "message": "You can't delete a non existing user!",
+        }
+    elif contact.id == user_id:
+        return {
+            "status_code": 400,
+            "message": "You can't delete yourself!",
+        }
+    query = """
+        SELECT
+          *
+        FROM
+          contacts
+        WHERE
+          user = :user_id
+        AND
+          contact = :contact_id
+    """
+    values = {"user_id": user_id, "contact_id": contact.id}
+    result = await session.execute(text(query), values)
+    contacts = result.fetchall()
+    if not contacts:
+        return {
+            "status_code": 400,
+            "message": "There is no contact to delete!",
+        }
+    else:
+        query = """
+            DELETE
+            FROM
+              contacts
+            WHERE
+              user = :user_id
+            AND
+              contact = :contact_id
+        """
+        values = {"user_id": user_id, "contact_id": contact.id}
+        await session.execute(text(query), values)
+
+        results = {
+            "status_code": 200,
+            "message": f"{contact.first_name} has been deleted from your"
+            " contact list!",
+        }
+    return results
+
+
 async def get_contacts(session: AsyncSession):
     # get all contacts for each user.
     query = """
@@ -139,6 +192,12 @@ async def search_user_contacts(
     search: str, user_id: int, session: AsyncSession
 ):
     user = await find_existed_user_contact(user_id, session)
+    if not search:
+        results = {
+            "status_code": 400,
+            "result": "You can't search against an empty string!",
+        }
+        return results
     if user:
         # TODO: CONCAT(*, :search, *)
         query = """
@@ -159,7 +218,7 @@ async def search_user_contacts(
                 email
               )
               AGAINST (
-                  :search
+                :search
               )
         """
         values = {"user_id": user_id, "search": search}

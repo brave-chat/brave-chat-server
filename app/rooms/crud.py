@@ -14,6 +14,7 @@ from app.auth.crud import (
     find_existed_user,
 )
 from app.chats.crud import (
+    delete_room_messages,
     send_new_message,
 )
 from app.chats.schemas import (
@@ -105,6 +106,21 @@ async def join_room(user_id: int, room_id: int, session: AsyncSession):
     return await session.execute(text(query), values)
 
 
+async def delete_room_user(user_id: int, room_id: int, session: AsyncSession):
+    query = """
+        DELETE
+        FROM
+          room_members
+        WHERE
+          room = :room
+        AND
+          member = :member
+    """
+    values = {"room": room_id, "member": user_id}
+
+    return await session.execute(text(query), values)
+
+
 async def create_assign_new_room(
     user_id: int, room_obj, session: AsyncSession
 ):
@@ -170,20 +186,33 @@ async def get_room_conversations(
         }
     query = """
         SELECT
-            id,
-            content,
+            messages.id as msg_id,
+            messages.content,
             CASE
-                WHEN sender = :sender_id THEN "sent"
+                WHEN messages.sender = :sender_id THEN "sent"
                 ELSE "received"
             END as type,
-            media,
-            creation_date
+            messages.media,
+            messages.creation_date,
+            users.id as id,
+            users.first_name,
+            users.last_name,
+            users.bio,
+            users.chat_status,
+            users.email,
+            users.phone_number,
+            users.profile_picture
+
         FROM
             messages
+        LEFT JOIN
+            users
+        ON
+          messages.sender = users.id
         WHERE
-          room = :room_id
+          messages.room = :room_id
         ORDER BY
-          creation_date
+          messages.creation_date
     """
     values = {"room_id": room.id, "sender_id": sender_id}
     result = await session.execute(text(query), values)
@@ -223,4 +252,122 @@ async def send_new_room_message(
         results = await send_new_message(
             sender_id, request, None, room.id, session
         )
+    return results
+
+
+async def leave_room_user(user_id: int, room_name, session: AsyncSession):
+    if not room_name:
+        results = {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+        return results
+    room = await find_existed_room(room_name, session)
+    if not room:
+        logger.info("Can't leave a non existing room!")
+        results = {
+            "status_code": 400,
+            "message": "You can't leave a non existing room",
+        }
+    else:
+        user = await find_existed_user_in_room(user_id, room.id, session)
+        if user:
+            await delete_room_user(user_id, room.id, session)
+            logger.info(f"`{user_id}` has left this room!")
+            results = {
+                "status_code": 200,
+                "message": f"You have left room {room_name}!",
+            }
+        else:
+            logger.info(
+                f"User {user_id} is not a member of room `{room_name}`."
+            )
+            results = {
+                "status_code": 200,
+                "message": f"You are not a member of room {room_name}!",
+            }
+    return results
+
+
+async def delete_room_user_chat(
+    user_id: int, room_name, session: AsyncSession
+):
+    if not room_name:
+        results = {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+        return results
+    room = await find_existed_room(room_name, session)
+    if not room:
+        logger.info("Can't delete messages in a non existing room!")
+        results = {
+            "status_code": 400,
+            "message": "You can't delete messages in a non existing room!",
+        }
+    else:
+        user = await find_existed_user_in_room(user_id, room.id, session)
+        if user:
+            results = await delete_room_messages(user_id, room.id, session)
+            logger.info(
+                f"`{user_id}` has deleted their messages in this room!"
+            )
+        else:
+            logger.info(
+                f"User {user_id} is not a member of room `{room_name}`."
+            )
+            results = {
+                "status_code": 200,
+                "message": f"You are not a member of room {room_name}!",
+            }
+    return results
+
+
+async def search_rooms(search: str, user_id: int, session: AsyncSession):
+    if not search:
+        results = {
+            "status_code": 400,
+            "result": "You can't search against an empty string!",
+        }
+        return results
+    query = """
+        SELECT
+          *
+        FROM
+          room_members
+        LEFT JOIN
+          rooms
+        ON
+          room_members.room= rooms.id
+        WHERE
+          room_members.member= :user_id
+        AND
+          INSTR(room_name, :search) > 0
+    """
+    values = {"user_id": user_id, "search": search.lower()}
+    result = await session.execute(text(query), values)
+    return_results = result.fetchall()
+    results = {"status_code": 200, "result": return_results}
+    return results
+
+
+async def get_rooms_user(user_id: int, session: AsyncSession):
+    # get all rooms for this user.
+    query = """
+        SELECT
+          *
+        FROM
+          room_members
+        LEFT JOIN
+          rooms
+        ON
+          room_members.room= rooms.id
+        WHERE
+          room_members.member= :user_id
+    """
+    values = {"user_id": user_id}
+
+    result = await session.execute(text(query), values)
+    contacts = result.fetchall()
+    results = {"status_code": 200, "result": contacts}
     return results

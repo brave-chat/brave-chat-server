@@ -111,6 +111,12 @@ async def _engine() -> AsyncGenerator[AsyncEngine, None]:
                 f" VALUES ('test', 'user', 'test@example.com','{get_password_hash('test')}', 1);",  # noqa: E501
             )
         )
+        await conn.execute(
+            text(
+                "INSERT INTO users (first_name, last_name, email, password, user_status)"  # noqa: E501
+                f" VALUES ('test1', 'user1', 'test1@example.com','{get_password_hash('test')}', 1);",  # noqa: E501
+            )
+        )
 
     try:
         yield autocommit_engine
@@ -214,7 +220,7 @@ async def client(
         yield acc
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def token(fastapi_app: FastAPI, client: AsyncClient) -> str:
     email = "test@example.com"
     password = "test"
