@@ -9,10 +9,11 @@
 
 [![Architecture](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/32lsb1pwom7ch3yx0yxi.jpg)](https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-A Fully Async based backend for the [react chat application](https://github.com/wiseaidev/chat).
+A Fully Async based backend for the [react chat application](https://github.com/wiseaidev/chat). It is a multi-model server that is fully functional and supports all the usual messaging app capabilities such as of one-on-one (private) and room messaging. It enables users to send text and multimedia messages(e.g. images). Also, users can freely create, join, and leave chat rooms where everyone can message each other.
 
 ## Table of Contents
 
+- [Features](#features)
 - [Development Requirements](#development-requirements)
 - [Project Structure](#project-structure)
 - [Installation with Make](#installation-with-make)
@@ -30,12 +31,28 @@ A Fully Async based backend for the [react chat application](https://github.com/
 - [Access Prometheus Metrics](#access-prometheus-metrics)
 - [Deployment](#deployment)
   - [Deta Micros](#deta-micros)
-  - [Using The CLI with make](#using-the-cli-with-make)
   - [Heroku](#heroku)
   - [Vercel](#vercel)
   - [Netlify(Not Possible)](#netlifynot-possible)
 - [Core Dependencies](#core-dependencies)
+- [TODO & Contributions](#todo-and-contributions)
 - [License](#license)
+
+## Features
+
+This project supports the following features:
+
+- File transfer.
+- Multi-model Database.
+- Highly scalable architecture.
+- Changing user profile information.
+- Add, remove users to/from contacts list.
+- Unicast messaging (e.g. Sending private messages).
+- A pub/sub Redis architecture built on top of web-sockets.
+- Broadcast messaging (e.g. Sending messages in a chat room).
+- Only receive messages from contacts to avoid being bothered by others.
+- A Monolith architecture, but its modularity allows it to be divided into microservices.
+- Full control over your messages with the ability to create, delete, and edit them as you please.
 
 ## Development Requirements
 
@@ -279,6 +296,15 @@ The following packages are the main dependencies used to build this project:
 - [`python-multipart`](https://github.com/andrew-d/python-multipart)
 - [`deta-python`](https://github.com/deta/deta-python)
 - [`prometheus-fastapi-instrumentator`](https://github.com/trallnag/prometheus-fastapi-instrumentator)
+
+## TODO and Contributions
+
+This project is open for anyone to contribute:
+
+- Adding support for multimedia messages other than images such as PDFs, txt, and more.
+- Store messages content in the database as encrypted data rather than plain text. You can refer to the signal protocol for ideas.
+- Sending voice messages.
+- Design and implement a k8s architecture and deploy it on GCP.
 
 ## License
 
