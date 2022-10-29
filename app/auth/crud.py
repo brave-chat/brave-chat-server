@@ -71,7 +71,9 @@ async def find_existed_user_id(id: int, session: AsyncSession):
     values = {"id": id}
     result = await session.execute(text(query), values)
     user = result.fetchone()
-    return UserObjectSchema(**user)
+    if user:
+        return UserObjectSchema(**user)
+    return user
 
 
 async def get_users_with_black_listed_token(token: str, session: AsyncSession):

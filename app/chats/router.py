@@ -13,6 +13,7 @@ from app.auth.schemas import (
     ResponseSchema,
 )
 from app.chats.crud import (
+    get_chats_user,
     get_sender_receiver_messages,
     send_new_message,
 )
@@ -79,7 +80,7 @@ async def send_message(
 async def get_conversation(
     receiver: str,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
-    session: AsyncSession = Depends(get_db_transactional_session),
+    session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Return all messages grouped by senders for a given receiver.
@@ -87,4 +88,21 @@ async def get_conversation(
     results = await get_sender_receiver_messages(
         currentUser, receiver, session
     )
+    return results
+
+
+@router.get(
+    "/contacts/chat/search",
+    status_code=200,
+    name="chats:get-user-chat-list",
+)
+async def get_chats_user_list(
+    search: str,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    """
+    Get all chats for an authenticated user.
+    """
+    results = await get_chats_user(currentUser.id, search, session)
     return results

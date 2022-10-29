@@ -41,7 +41,7 @@ class RequestRoomObject(NamedTuple):
 
 
 class RequestContactObject(NamedTuple):
-    receiver: int
+    receiver: str
     content: str
     message_type: str
     media: str
@@ -90,8 +90,11 @@ async def consumer_handler(
                         topic, json.dumps(message_data, default=str)
                     )
                     if receiver_id:
+                        receiver = await find_existed_user_id(
+                            receiver_id, session
+                        )
                         request = RequestContactObject(
-                            receiver_id,
+                            receiver.email,
                             message_data["content"],
                             message_data["type"],
                             "",

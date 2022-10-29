@@ -20,6 +20,28 @@ from app.users.schemas import (
 logger = logging.getLogger(__name__)
 
 
+async def find_existed_user_messages(
+    user_id: int,
+    session: AsyncSession,
+):
+    query = """
+        SELECT
+          *
+        FROM
+          messages
+        WHERE
+          sender = :sender_id
+        OR
+          receiver = :sender_id
+    """
+    values = {
+        "sender_id": user_id,
+    }
+    result = await session.execute(text(query), values)
+    messages = result.fetchall()
+    return messages
+
+
 async def send_new_message(
     sender_id: int,
     request: MessageCreate,
@@ -59,6 +81,7 @@ async def send_new_message(
                   content,
                   message_type,
                   media,
+                  status,
                   creation_date
                 )
                 VALUES (
@@ -67,6 +90,7 @@ async def send_new_message(
                   :content,
                   :message_type,
                   :media,
+                  1,
                   :creation_date
                 )
             """
@@ -86,6 +110,7 @@ async def send_new_message(
                   content,
                   message_type,
                   media,
+                  status,
                   creation_date
                 )
                 VALUES (
@@ -94,6 +119,7 @@ async def send_new_message(
                   :content,
                   :message_type,
                   :media,
+                  1,
                   :creation_date
                 )
             """
@@ -201,4 +227,69 @@ async def get_sender_receiver_messages(
         "status_code": 200,
         "result": messages_sent_received,
     }
+    # Mark received messages by this sender as read
+    query = """
+        UPDATE
+          messages
+        SET
+          status = 0,
+          modified_date = :modified_date
+        WHERE
+          sender = :receiver_id
+        AND
+          receiver = :sender_id
+    """
+    values = {
+        "sender_id": sender.id,
+        "receiver_id": receiver.id,
+        "modified_date": datetime.datetime.utcnow(),
+    }
+    await session.execute(text(query), values)
     return results
+
+
+async def get_chats_user(user_id: int, search, session: AsyncSession):
+    search = search.lower
+    messages = await find_existed_user_messages(user_id, session)
+    if messages:
+        # get all contacts for each user.
+        query = """
+            SELECT
+              messages.id as id,
+              content,
+              MAX(messages.creation_date) OVER(PARTITION BY users.email) AS last_message_time,
+              SUM(status) OVER(PARTITION BY users.email) AS nb_unread_message,
+              users.id as user_id,
+              users.first_name,
+              users.last_name,
+              users.bio,
+              users.chat_status,
+              users.email,
+              users.phone_number,
+              users.profile_picture
+            FROM
+              messages
+            LEFT JOIN
+              users
+            ON
+              messages.sender = users.id
+            WHERE
+              messages.receiver = :user_id
+        """
+        values = {"user_id": user_id}
+        result = await session.execute(text(query), values)
+        contacts = result.fetchall()
+        # HAVING after a window function is not supported by SINGLESTORE
+        if contacts:
+            contacts = list(
+                {
+                    dict(myObject)["email"]: dict(myObject)
+                    for myObject in contacts
+                }.values()
+            )
+        results = {"status_code": 200, "result": contacts}
+        return results
+    return {
+        "status_code": 200,
+        "message": "There are no messages sent to you!",
+    }
