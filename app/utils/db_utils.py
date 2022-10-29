@@ -2,10 +2,6 @@ from sqlalchemy import (
     text,
 )
 
-from app.config import (
-    settings,
-)
-
 
 async def create_database(engine) -> None:
     """Create a databse."""

@@ -9,9 +9,6 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 
-from app.auth.crud import (
-    find_existed_user,
-)
 from app.auth.schemas import (
     UserSchema,
 )

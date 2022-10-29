@@ -18,12 +18,6 @@ from prometheus_fastapi_instrumentator.metrics import (
     Info,
 )
 import shutil
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-)
-from sqlalchemy.orm import (
-    sessionmaker,
-)
 import time
 from typing import (
     Callable,
