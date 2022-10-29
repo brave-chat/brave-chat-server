@@ -14,7 +14,7 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: pretty-format-json
-        args: ["--autofix", "--allow-missing-credentials"]
+        args: ["--autofix"]
       - id: mixed-line-ending
         args: ["--fix=lf"]
         description: Forces to replace line ending by the UNIX 'lf' character.
