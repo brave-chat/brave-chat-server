@@ -4,7 +4,6 @@ from aioredis.client import (
 )
 from fastapi.websockets import (
     WebSocket,
-    WebSocketDisconnect,
 )
 import json
 import logging

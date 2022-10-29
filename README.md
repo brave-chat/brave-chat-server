@@ -26,6 +26,7 @@ A Fully Async based backend for the [react chat application](https://github.com/
   - [7. Set your Redis Cloud Credentials](#7-set-your-redis-cloud-credentials)
   - [8. Generate a secret key](#8-generate-a-secret-key)
   - [9. Run Localhost](#9-run-localhost)
+- [Installation with Docker Compose v2](#installation-with-docker-compose-v2)
 - [Access Swagger Documentation](#access-swagger-documentation)
 - [Access Redocs Documentation](#access-redocs-documentation)
 - [Access Prometheus Metrics](#access-prometheus-metrics)
@@ -208,6 +209,36 @@ DEBUG=False
 
 ```sh
 $ make run
+```
+
+## Installation with Docker Compose v2
+
+Make sure your have [compose v2](https://github.com/docker/compose) installed and configured on your machine, and run the following command to build the predefined docker services(make sure you have a .env file beforehand):
+
+**Using Make**
+
+```sh
+make docker-build
+```
+
+or simply running:
+
+```
+docker compose build
+```
+
+Once that is done, you can spin up the container:
+
+**Using Make**
+
+```sh
+make up
+```
+
+or simply running:
+
+```
+make up
 ```
 
 ## Access Swagger Documentation

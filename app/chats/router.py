@@ -26,7 +26,6 @@ from app.users.schemas import (
 )
 from app.utils.dependencies import (
     get_db_autocommit_session,
-    get_db_transactional_session,
 )
 from app.utils.jwt_util import (
     get_current_active_user,

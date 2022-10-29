@@ -15,7 +15,6 @@ from app.auth.schemas import (
 from app.contacts.crud import (
     create_new_contact,
     delete_contact_user,
-    get_contacts,
     get_user_contacts,
     search_user_contacts,
 )
@@ -28,7 +27,6 @@ from app.users.schemas import (
 )
 from app.utils.dependencies import (
     get_db_autocommit_session,
-    get_db_transactional_session,
 )
 from app.utils.jwt_util import (
     get_current_active_user,

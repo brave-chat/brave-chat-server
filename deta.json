@@ -1,64 +1,64 @@
 {
-  "name": "chat-app-backend",
   "description": "A fully async based backend for the chat application built using FastAPI, SingleStore with aiomysql, databases, pydantic, SQLAlchemy, and Deta.",
-  "runtime": "python3.9",
   "env": [
     {
-      "key": "SINGLESTORE_USERNAME",
       "description": "This is the user name you'll be creating for remote accesses. By default, this variable is equal to admin.",
-      "value": "admin",
-      "required": false
+      "key": "SINGLESTORE_USERNAME",
+      "required": false,
+      "value": "admin"
     },
     {
-      "key": "SINGLESTORE_PASSWORD",
       "description": "The corresponding password for that user.",
-      "value": "",
-      "required": true
+      "key": "SINGLESTORE_PASSWORD",
+      "required": true,
+      "value": ""
     },
     {
-      "key": "SINGLESTORE_HOST",
       "description": "Your remote MySQL server's domain name.",
-      "value": "",
-      "required": true
+      "key": "SINGLESTORE_HOST",
+      "required": true,
+      "value": ""
     },
     {
-      "key": "SINGLESTORE_PORT",
       "description": "The port number where MySQL is listening to.",
-      "value": "3306",
-      "required": true
+      "key": "SINGLESTORE_PORT",
+      "required": true,
+      "value": "3306"
     },
     {
-      "key": "SINGLESTORE_DATABASE",
       "description": "The name of the database you want to access, in our case, the `chat` database.",
-      "value": "chat",
-      "required": true
+      "key": "SINGLESTORE_DATABASE",
+      "required": true,
+      "value": "chat"
     },
     {
-      "key": "JWT_SECRET_KEY",
       "description": "Secret used to sign the JWTs",
+      "key": "JWT_SECRET_KEY",
       "required": true
     },
     {
-      "key": "REDIS_USERNAME",
       "description": "Your Redis account username. `default` is the default username.",
-      "value": "default",
-      "required": false
+      "key": "REDIS_USERNAME",
+      "required": false,
+      "value": "default"
     },
     {
-      "key": "REDIS_PASSWORD",
       "description": "Your Redis account password.",
+      "key": "REDIS_PASSWORD",
       "required": true
     },
     {
-      "key": "REDIS_HOST",
       "description": "Your Redis url to the node to connect.",
+      "key": "REDIS_HOST",
       "required": true
     },
     {
-      "key": "REDIS_PORT",
       "description": "Your Redis node exposed port number. `15065` is the default.",
-      "value": "15065",
-      "required": false
+      "key": "REDIS_PORT",
+      "required": false,
+      "value": "15065"
     }
-  ]
+  ],
+  "name": "chat-app-backend",
+  "runtime": "python3.9"
 }

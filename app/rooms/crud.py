@@ -6,22 +6,13 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.sql import (
     text,
 )
-from typing import (
-    Optional,
-)
 
-from app.auth.crud import (
-    find_existed_user,
-)
 from app.chats.crud import (
     delete_room_messages,
     send_new_message,
 )
 from app.chats.schemas import (
     MessageCreateRoom,
-)
-from app.users.schemas import (
-    UserObjectSchema,
 )
 
 logger = logging.getLogger(__name__)

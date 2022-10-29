@@ -8,7 +8,6 @@ from httpx import (
 )
 import json
 from starlette.status import (
-    HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )

@@ -9,7 +9,6 @@ from httpx import (
 import json
 from starlette.status import (
     HTTP_200_OK,
-    HTTP_400_BAD_REQUEST,
 )
 
 

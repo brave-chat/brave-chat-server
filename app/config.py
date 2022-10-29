@@ -11,9 +11,6 @@ from pydantic import (
 from tempfile import (
     gettempdir,
 )
-from typing import (
-    Any,
-)
 
 TEMP_DIR = Path(gettempdir())
 

@@ -10,9 +10,6 @@ from sqlalchemy.sql import (
 from app.auth.crud import (
     find_existed_user,
 )
-from app.users.schemas import (
-    UserObjectSchema,
-)
 
 logger = logging.getLogger(__name__)
 

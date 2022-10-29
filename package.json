@@ -1,22 +1,22 @@
 {
-  "name": "fastapi-singlestore-backend",
-  "version": "0.1.0",
+  "author": "wiseaidev",
+  "bugs": {
+    "url": "https://github.com/wiseaidev/fastapi-singlestore-backend/issues"
+  },
   "description": "The server part of the chat app powered by FastAPI and Singlestore.",
-  "main": "index.js",
   "directories": {
     "test": "tests"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "homepage": "https://github.com/wiseaidev/fastapi-singlestore-backend#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "name": "fastapi-singlestore-backend",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wiseaidev/fastapi-singlestore-backend.git"
   },
-  "author": "wiseaidev",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/wiseaidev/fastapi-singlestore-backend/issues"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/wiseaidev/fastapi-singlestore-backend#readme"
+  "version": "0.1.0"
 }
