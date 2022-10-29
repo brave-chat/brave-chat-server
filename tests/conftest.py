@@ -1,10 +1,5 @@
 import pytest
 
-import asyncio
-from asyncio.events import (
-    AbstractEventLoop,
-)
-import datetime
 from fastapi import (
     FastAPI,
 )
@@ -18,7 +13,6 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
-    async_scoped_session,
     create_async_engine,
 )
 from sqlalchemy.orm import (
@@ -27,7 +21,6 @@ from sqlalchemy.orm import (
 from typing import (
     Any,
     AsyncGenerator,
-    Generator,
 )
 
 from app.config import (
@@ -36,12 +29,6 @@ from app.config import (
 from app.utils.db_utils import (
     create_database,
     drop_database,
-)
-from app.utils.dependencies import (
-    get_db_autocommit_session,
-)
-from app.utils.engine import (
-    init_engine_app,
 )
 
 
