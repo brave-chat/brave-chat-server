@@ -98,12 +98,32 @@ install: generate_dot_env
 	poetry install --only main
 	@echo ""
 
+docker-install:
+	@echo ""
+	@echo "*** installing the required dependencies... ***"
+	@echo ""
+	@echo ""
+	: `curl -sSL https://install.python-poetry.org | python3 - --uninstall`
+	: `rm -rf /home/${USER}/.poetry`
+	: `rm -rf /home/${USER}/.pyenv/shims/poetry`
+	curl -sSL https://install.python-poetry.org | python3 - --version 1.2.2
+	/root/.local/bin/poetry install --only main --no-root
+	@echo ""
+
+docker-run:
+	@echo ""
+	@echo "*** Running the app locally... ***"
+	@echo ""
+	@echo ""
+	/root/.local/bin/poetry run server
+	@echo ""
+
 run:
 	@echo ""
 	@echo "*** Running the app locally... ***"
 	@echo ""
 	@echo ""
-	PYTHONPATH=app/ poetry run server
+	poetry run server
 	@echo ""
 
 deploy-deta:
@@ -128,12 +148,14 @@ release: dist ## package and upload a release
 dist: clean ## builds source and wheel package
 	poetry build
 
-up: generate_dot_env
-	docker-compose build
-	docker-compose up -d
+docker-build:
+	docker compose build
+
+up:
+	docker compose up
 
 down:
-	docker-compose down
+	docker compose down
 
 version-major:
 	bump2version major
