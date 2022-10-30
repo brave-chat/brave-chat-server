@@ -26,13 +26,16 @@ A Fully Async based backend for the [react chat application](https://github.com/
   - [7. Set your Redis Cloud Credentials](#7-set-your-redis-cloud-credentials)
   - [8. Generate a secret key](#8-generate-a-secret-key)
   - [9. Run Localhost](#9-run-localhost)
-- [Installation with Docker Compose v2](#installation-with-docker-compose-v2)
+- [Running locally with Compose v2](#running-locally-with-compose-v2)
 - [Access Swagger Documentation](#access-swagger-documentation)
 - [Access Redocs Documentation](#access-redocs-documentation)
 - [Access Prometheus Metrics](#access-prometheus-metrics)
-- [Deployment](#deployment)
+- [Access Grafana Dashboard](#access-grafana-dashboard)
+- [Cloud Deployments](#cloud-deployments)
   - [Deta Micros](#deta-micros)
+    - [Deta CLI](#deta-cli)
   - [Heroku](#heroku)
+    - [Heroku CLI](#Heroku-cli)
   - [Vercel](#vercel)
   - [Netlify(Not Possible)](#netlifynot-possible)
 - [Core Dependencies](#core-dependencies)
@@ -119,7 +122,8 @@ The best way to configure, install main dependencies, and run the project is by 
 Having `make` installed and configured on your machine, you can now run `make` under the root directory of this project to explore different available commands to run:
 
 ```sh
-$ make
+make
+
 Please use 'make <target>' where <target> is one of:
 
 venv                     Create a virtual environment
@@ -136,19 +140,19 @@ coverage                 Check code coverage quickly with the default Python
 ### 1. Create a virtualenv
 
 ```sh
-$ make venv
+make venv
 ```
 
 ### 2. Activate the virtualenv
 
 ```sh
-$ source .venv/bin/activate
+source .venv/bin/activate
 ```
 
 ### 3. Install dependencies
 
 ```sh
-$ make install
+make install
 ```
 
 **Note**: _This command will automatically generate a `.env` file from `.env.example`, uninstall the old version of poetry on your machine, then install latest version `1.2.2`, and install the required main dependencies._
@@ -195,7 +199,8 @@ REDIS_PORT=15065
 Generate a secret key using openssl and update its env var in .env file.
 
 ```sh
-$ openssl rand -hex 128
+openssl rand -hex 128
+
 afa1639545d53ecf83c9f8acf4704abe1382f9a9dbf76d2fd229d4795a4748712dbfe7cf1f0a812f1c0fad2d47c8343cd1017b22fc3bf43d052307137f6ba68cd2cb69748b561df846873a6257e3569d6307a7e022b82b79cb3d6e0fee00553d80913c1dcf946e2e91e1dfcbba1ed9f34c9250597c1f70f572744e91c68cbe76
 ```
 
@@ -208,10 +213,10 @@ DEBUG=False
 ### 9. Run Localhost
 
 ```sh
-$ make run
+make run
 ```
 
-## Installation with Docker Compose v2
+## Running locally with Compose v2
 
 Make sure your have [compose v2](https://github.com/docker/compose) installed and configured on your machine, and run the following command to build the predefined docker services(make sure you have a .env file beforehand):
 
@@ -235,10 +240,10 @@ Once that is done, you can spin up the container:
 make up
 ```
 
-or simply running:
+or running:
 
 ```
-make up
+docker compose up
 ```
 
 ## Access Swagger Documentation
@@ -253,19 +258,21 @@ make up
 
 > <http://localhost:8000/metrics>
 
-## Deployment
+## Access Grafana Dashboard
 
-To use the deta version of the API you'll need to create a Deta account.
+> <http://localhost:3000>
 
-### Deta Micros
+## Cloud Deployments
 
-This deployment option fits within the Deta theme.
+## Deta Micros
+
+To use the Deta version of the APIs you'll need to create a Deta account.
 
 [![Deploy on Deta](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-### Using The CLI with make
+#### Deta CLI
 
-Make sure you have Deta cli on your machine. If it is not the case, just run the following command(on a linux distro or Mac):
+Make sure you have Deta cli installed on your machine. If it is not the case, just run the following command(on a linux distro or Mac):
 
 ```sh
 curl -fsSL https://get.deta.dev/cli.sh | sh
@@ -280,7 +287,7 @@ PATH="/home/<user_name>/.deta/bin:$PATH"
 Now you can deploy the app on a Deta Micro:
 
 ```sh
-$ make deploy-deta
+make deploy-deta
 ```
 
 You can then use the Deta UI to check the logs and the URL the API is hosted on.
@@ -296,6 +303,72 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 ### Heroku
 
 [![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
+
+#### Heroku CLI
+
+Before going any further, make sure you already installed and configured the Heroku CLI on you machine. If it is not the case, you can install it on Ubuntu using the followig command:
+
+```sh
+sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+```
+
+Now, you need to install the Heroku container registry plugin:
+
+```sh
+heroku plugins:install heroku-container-registry
+```
+
+Once that completed, Login to your registry:
+
+```sh
+heroku container:login
+```
+
+Set your env variables from the `.env` file:
+
+```sh
+xargs -a .env -I {} heroku config:set {}
+```
+
+Log in to the Heroku Docker registry before.
+
+```sh
+heroku auth:token | docker login --username=_ registry.heroku.com --password-stdin
+```
+
+heroku container:release ${item.apptype} --app ${item.appname}
+
+Build your container images:
+
+```sh
+docker build tag lb -f Dockerfile.haproxy
+docker tag app1 registry.heroku.com/fastapi-singlestore-backend_app1/web
+docker tag app2 registry.heroku.com/fastapi-singlestore-backend_app2/web
+docker tag app3 registry.heroku.com/fastapi-singlestore-backend_app3/web
+docker tag app4 registry.heroku.com/fastapi-singlestore-backend_app4/web
+```
+
+Push containers to docker hub:
+
+```sh
+docker push registry.heroku.com/app1/web
+docker push registry.heroku.com/app2/web
+docker push registry.heroku.com/app3/web
+docker push registry.heroku.com/app4/web
+docker push registry.heroku.com/lb/web
+```
+
+Deploy containers on Heroku:
+
+```sh
+heroku container:push app1 --app ${your heroku app}
+heroku container:push app2 --app ${your heroku app}
+heroku container:push app3 --app ${your heroku app}
+heroku container:push app4 --app ${your heroku app}
+heroku container:push lb --app ${your heroku app}
+```
+
+Todo: Figure out a better way to deploy multiple containers on Heroku because the above didn't work(it seems like it is not possible).
 
 ### Vercel
 
