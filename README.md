@@ -235,10 +235,10 @@ Once that is done, you can spin up the container:
 make up
 ```
 
-or simply running:
+or running:
 
 ```
-make up
+docker compose up
 ```
 
 ## Access Swagger Documentation

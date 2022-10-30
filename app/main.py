@@ -140,6 +140,7 @@ logger = logging.getLogger(__name__)
 # change this if in production
 if not settings.DEBUG:
     chat_app = FastAPI(
+        root_path="/api/v1",
         docs_url="/docs",
         redoc_url="/redocs",
         title="Realtime Chat App",
@@ -149,6 +150,7 @@ if not settings.DEBUG:
     )
 else:
     chat_app = FastAPI(
+        root_path="/api/v1",
         docs_url="/docs",
         redoc_url="/redocs",
         title="Realtime Chat App",
