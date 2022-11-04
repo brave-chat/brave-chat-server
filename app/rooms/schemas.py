@@ -1,6 +1,7 @@
 import datetime
 from pydantic import (
     BaseModel,
+    Field,
 )
 from typing import (
     Union,
@@ -26,3 +27,11 @@ class RoomGetALL(BaseModel):
     messages: list[dict[str, Union[str, datetime.datetime]]]
     active: str
     creation_date: datetime.datetime
+
+
+class LeaveRoom(BaseModel):
+    room_name: str = Field(..., example="A room name to leave.")
+
+
+class DeleteRoomConversation(BaseModel):
+    room_name: str = Field(..., example="A room name to delete messages.")

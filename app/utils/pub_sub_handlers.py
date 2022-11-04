@@ -2,6 +2,10 @@ from aioredis.client import (
     PubSub,
     Redis,
 )
+from asyncio import (
+    ensure_future,
+)
+import base64
 from fastapi.websockets import (
     WebSocket,
 )
@@ -26,6 +30,9 @@ from app.chats.crud import (
 )
 from app.rooms.crud import (
     send_new_room_message,
+)
+from app.users.crud import (
+    update_chat_status,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -64,11 +71,12 @@ async def consumer_handler(
             }
         else:
             data = {
-                "content": f"{user.first_name} has joined the room!",
+                "content": f"{user.first_name} is online!",
                 "room_name": topic,
-                "type": "entrance",
+                "type": "online",
                 "user": dict(user),
             }
+        await update_chat_status("online", user, session)
         await connection.publish(topic, json.dumps(data, default=str))
         # wait for messages
         while True:
@@ -79,8 +87,40 @@ async def consumer_handler(
                 if message_data.get("type", None) == "leave":
                     logger.warning(message_data)
                     logger.info("Disconnecting from Websocket")
-                    # await web_socket.close()
-                    # break
+                    await update_chat_status("offline", user, session)
+                    data = {
+                        "content": f"{user.first_name} went offline!",
+                        "type": "offline",
+                        "user": dict(user),
+                    }
+                    await connection.publish(
+                        topic, json.dumps(data, default=str)
+                    )
+                    await web_socket.close()
+                    break
+                elif message_data.get("type", None) == "media":
+                    data = message_data.pop("content")
+                    bin_photo = base64.b64decode(data)
+                    # f.write(bin_photo)
+                    if receiver_id:
+                        receiver = await find_existed_user_id(
+                            receiver_id, session
+                        )
+                        request = RequestContactObject(
+                            receiver.email,
+                            "",
+                            message_data["type"],
+                            message_data,
+                        )
+                        url = await send_new_message(
+                            sender_id, request, bin_photo, None, session
+                        )
+                        message_data["media"] = url
+                        message_data["content"] = ""
+                        message_data.pop("preview")
+                        await connection.publish(
+                            topic, json.dumps(message_data, default=str)
+                        )
                 else:
                     logger.info(
                         f"CONSUMER RECIEVED: {json.dumps(message_data, default=str)}"  # noqa: E501
@@ -98,8 +138,10 @@ async def consumer_handler(
                             message_data["type"],
                             "",
                         )
-                        await send_new_message(
-                            sender_id, request, None, None, session
+                        ensure_future(
+                            send_new_message(
+                                sender_id, request, None, None, session
+                            )
                         )
                     else:
                         request = RequestRoomObject(
@@ -108,18 +150,19 @@ async def consumer_handler(
                             message_data["type"],
                             "",
                         )
-                        await send_new_room_message(
-                            sender_id, request, session
+                        ensure_future(
+                            send_new_room_message(sender_id, request, session)
                         )
                     del request
             else:
                 logger.warning(
-                    f"Websocket state: {web_socket.application_state}, reconnecting..."  # noqa: E501
+                    f"Websocket state: {web_socket.application_state}."  # noqa: E501
                 )
-                await web_socket.accept()
+                break
     except Exception as ex:
         message = f"An exception of type {type(ex).__name__} occurred. Arguments:\n{ex.args!r}"  # noqa: E501
         logger.error(message)
+        await connection.close()
         # remove user
         logger.warning("Disconnecting Websocket")
 
@@ -143,9 +186,9 @@ async def producer_handler(
                     )
             else:
                 logger.warning(
-                    f"Websocket state: {web_socket.application_state}, reconnecting..."  # noqa: E501
+                    f"Websocket state: {web_socket.application_state}."  # noqa: E501
                 )
-                # await web_socket.accept()
+                break
     except Exception as ex:
         message = f"An exception of type {type(ex).__name__} occurred. Arguments:\n{ex.args!r}"  # noqa: E501
         logger.error(message)

@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     SINGLESTORE_PASSWORD: str = os.getenv("SINGLESTORE_PASSWORD")
     SINGLESTORE_DATABASE: str = os.getenv("SINGLESTORE_DATABASE")
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
+    DETA_PROJECT_KEY: str = os.getenv("DETA_PROJECT_KEY")
     DEBUG: bool = os.getenv("DEBUG")
 
     # This variable is used to define
@@ -55,7 +56,7 @@ class Settings(BaseSettings):
                 + ":"
                 + self.SINGLESTORE_PORT
                 + "/"
-                + "test"
+                + self.SINGLESTORE_DATABASE
             )
 
         else:

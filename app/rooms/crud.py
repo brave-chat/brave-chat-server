@@ -113,7 +113,7 @@ async def delete_room_user(user_id: int, room_id: int, session: AsyncSession):
 
 
 async def create_assign_new_room(
-    user_id: int, room_obj, session: AsyncSession
+    user_id: int, room_obj, session: AsyncSession, join=False
 ):
     if not room_obj.room_name:
         results = {
@@ -123,7 +123,10 @@ async def create_assign_new_room(
         return results
     room = await find_existed_room(room_obj.room_name, session)
     if not room:
-        await create_room(room_obj.room_name, room_obj.description, session)
+        if not join:
+            await create_room(
+                room_obj.room_name, room_obj.description, session
+            )
         logger.info(f"Creating room `{room_obj.room_name}`.")
         room = await find_existed_room(room_obj.room_name, session)
         user = await find_existed_user_in_room(user_id, room.id, session)
@@ -232,7 +235,7 @@ async def send_new_room_message(
         }
     user = await find_existed_user_in_room(sender_id, room.id, session)
     if not user:
-        logger.info(f"`{user.id}` can't send a message to this room!")
+        logger.info("Can't send a message to this room!")
         results = {
             "status_code": 400,
             "message": "You can't send a message to a room you"
@@ -316,30 +319,45 @@ async def delete_room_user_chat(
 
 async def search_rooms(search: str, user_id: int, session: AsyncSession):
     if not search:
-        results = {
-            "status_code": 400,
-            "result": "You can't search against an empty string!",
-        }
+        query = """
+            SELECT
+              *
+            FROM
+              room_members
+            LEFT JOIN
+              rooms
+            ON
+              room_members.room= rooms.id
+            WHERE
+              room_members.member= :user_id
+        """
+        values = {"user_id": user_id}
+        result = await session.execute(text(query), values)
+        return_results = result.fetchall()
+        results = {"status_code": 200, "result": return_results}
         return results
-    query = """
-        SELECT
-          *
-        FROM
-          room_members
-        LEFT JOIN
-          rooms
-        ON
-          room_members.room= rooms.id
-        WHERE
-          room_members.member= :user_id
-        AND
-          INSTR(room_name, :search) > 0
-    """
-    values = {"user_id": user_id, "search": search.lower()}
-    result = await session.execute(text(query), values)
-    return_results = result.fetchall()
-    results = {"status_code": 200, "result": return_results}
-    return results
+    elif user_id and search:
+        query = """
+            SELECT
+              *
+            FROM
+              room_members
+            LEFT JOIN
+              rooms
+            ON
+              room_members.room= rooms.id
+            WHERE
+              room_members.member= :user_id
+            AND
+              INSTR(room_name, :search) > 0
+        """
+        values = {"user_id": user_id, "search": search.lower()}
+        result = await session.execute(text(query), values)
+        return_results = result.fetchall()
+        results = {"status_code": 200, "result": return_results}
+        return results
+
+    return {"status_code": 400, "message": "Something went wrong!"}
 
 
 async def get_rooms_user(user_id: int, session: AsyncSession):

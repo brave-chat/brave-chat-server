@@ -28,6 +28,10 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
 
     :param app: fastAPI application.
     """
+    from sqlalchemy import (
+        text,
+    )
+
     from app.auth.models import (  # noqa: WPS433
         AccessTokens,
     )
@@ -62,6 +66,10 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
     async with engine.begin() as conn:
         # await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+        # add support for emojies
+        await conn.execute(
+            text("ALTER TABLE messages MODIFY content TEXT CHARSET utf8mb4;")
+        )
 
     # Refer to https://github.com/sqlalchemy/sqlalchemy/discussions/8713 for more info.  # noqa: E501
     autocommit_engine = engine.execution_options(isolation_level="AUTOCOMMIT")

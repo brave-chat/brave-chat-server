@@ -82,7 +82,6 @@ async def websocket_contact_chat_endpoint(
         await websocket.accept()
         conn = await settings.redis_conn()
         pubsub = conn.pubsub()
-
         consumer_task = consumer_handler(
             connection=conn,
             topic="_".join(map(lambda val: str(val), sorted_chat)),

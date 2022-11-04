@@ -2,7 +2,12 @@ from enum import Enum
 from sqlalchemy import (
     Column,
     ForeignKey,
+    Integer,
     String,
+)
+from typing import (
+    Any,
+    Optional,
 )
 
 from app.utils.mixins import (
@@ -28,7 +33,7 @@ class Messages(Base, CommonMixin, TimestampMixin):
     room: int = Column(ForeignKey("rooms.id"), index=True, default=None)
     content: str = Column(String(1024), index=True)
     status: int = Column(
-        String(1024), index=True, default=MessageStatus.not_read.value
+        Integer, index=True, default=MessageStatus.not_read.value
     )
     message_type: str = Column(String(10), index=True)
-    media: str = Column(String(10))
+    media: Optional[Any] = Column(String(220), nullable=True)

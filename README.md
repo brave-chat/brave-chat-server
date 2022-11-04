@@ -1,4 +1,4 @@
-# Chat App SingleStore Based Backend
+# Brave Chat Server
 
 ![Vercel](https://vercelbadge.vercel.app/api/wiseaidev/fastapi-singlestore-backend)
 ![Codeql](https://github.com/github/docs/actions/workflows/codeql.yml/badge.svg)
@@ -25,36 +25,37 @@ A Fully Async based backend for the [react chat application](https://github.com/
   - [6. Setup a Redis account](#6-setup-a-redis-account)
   - [7. Set your Redis Cloud Credentials](#7-set-your-redis-cloud-credentials)
   - [8. Generate a secret key](#8-generate-a-secret-key)
-  - [9. Run Localhost](#9-run-localhost)
+  - [9. Set your Deta project key](#9-set-your-deta-project-key)
+  - [10. Generate a secret key](#10-generate-a-secret-key)
+  - [11. Run The Project Locally](#11-run-the-project-locally)
 - [Running locally with Compose v2](#running-locally-with-compose-v2)
 - [Access Swagger Documentation](#access-swagger-documentation)
 - [Access Redocs Documentation](#access-redocs-documentation)
 - [Access Prometheus Metrics](#access-prometheus-metrics)
 - [Access Grafana Dashboard](#access-grafana-dashboard)
 - [Cloud Deployments](#cloud-deployments)
-  - [Deta Micros](#deta-micros)
-    - [Deta CLI](#deta-cli)
+  - [Deta Micros (Not Possible)](#deta-micros-not-possible)
   - [Heroku](#heroku)
-    - [Heroku CLI](#Heroku-cli)
-  - [Vercel](#vercel)
-  - [Netlify(Not Possible)](#netlifynot-possible)
+  - [Vercel (Not Possible)](#vercel-not-possible)
+  - [Netlify (Not Possible)](#netlify-not-possible)
 - [Core Dependencies](#core-dependencies)
-- [TODO & Contributions](#todo-and-contributions)
+- [TODO and Contributions](#todo-and-contributions)
 - [License](#license)
 
 ## Features
 
 This project supports the following features:
 
-- File transfer.
+- Create, join rooms.
 - Multi-model Database.
 - Highly scalable architecture.
 - Changing user profile information.
 - Add, remove users to/from contacts list.
+- Sending an Receiving images in real time.
+- Sending an Receiving text messages in real time.
 - Unicast messaging (e.g. Sending private messages).
 - A pub/sub Redis architecture built on top of web-sockets.
 - Broadcast messaging (e.g. Sending messages in a chat room).
-- Only receive messages from contacts to avoid being bothered by others.
 - A Monolith architecture, but its modularity allows it to be divided into microservices.
 - Full control over your messages with the ability to create, delete, and edit them as you please.
 
@@ -176,7 +177,7 @@ SINGLESTORE_DATABASE=<database name>
 
 ### 6. Setup a Redis account
 
-You can refer to [this tutorial](https://redis.info/try-free-dev-to) to create a Redis account.
+Create a free account on [Redis Cloud](https://redis.info/try-free-dev-to).
 
 ### 7. Set your Redis Cloud Credentials
 
@@ -196,6 +197,19 @@ REDIS_PORT=15065
 
 ### 8. Generate a secret key
 
+Create a free account on [Deta](https://www.deta.sh/), and create a new project.
+
+### 9. Set your Deta project key
+
+Set the following environment variable in your `.env` file according to your project key value:
+
+```yaml
+# Deta
+DETA_PROJECT_KEY=
+```
+
+### 10. Generate a secret key
+
 Generate a secret key using openssl and update its env var in .env file.
 
 ```sh
@@ -210,7 +224,7 @@ JWT_SECRET_KEY=afa1639545d53ecf83c9f8acf4704abe1382f9a9dbf76d2fd229d4795a4748712
 DEBUG=False
 ```
 
-### 9. Run Localhost
+### 11. Run The Project Locally
 
 ```sh
 make run
@@ -260,17 +274,17 @@ docker compose up
 
 ## Access Grafana Dashboard
 
-> <http://localhost:3000>
+> <http://localhost:3001>
 
 ## Cloud Deployments
 
-## Deta Micros
+## Deta Micros (Not Possible)
 
 To use the Deta version of the APIs you'll need to create a Deta account.
 
 [![Deploy on Deta](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-#### Deta CLI
+#### Deta CLI (Not Possible)
 
 Make sure you have Deta cli installed on your machine. If it is not the case, just run the following command(on a linux distro or Mac):
 
@@ -304,7 +318,7 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 [![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-#### Heroku CLI
+#### Heroku CLI (Not Possible)
 
 Before going any further, make sure you already installed and configured the Heroku CLI on you machine. If it is not the case, you can install it on Ubuntu using the followig command:
 
@@ -335,8 +349,6 @@ Log in to the Heroku Docker registry before.
 ```sh
 heroku auth:token | docker login --username=_ registry.heroku.com --password-stdin
 ```
-
-heroku container:release ${item.apptype} --app ${item.appname}
 
 Build your container images:
 
@@ -370,13 +382,13 @@ heroku container:push lb --app ${your heroku app}
 
 Todo: Figure out a better way to deploy multiple containers on Heroku because the above didn't work(it seems like it is not possible).
 
-### Vercel
+### Vercel (Not Possible)
 
 This project makes use of WebSockets, which are unforunately not supported by Vercel's serverless functions.
 
 [![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
 
-### Netlify(Not Possible)
+### Netlify (Not Possible)
 
 This project makes use of WebSockets, which are unforunately not supported by Netlify's serverless functions.
 

@@ -135,7 +135,6 @@ async def login_user(form_data, session: AsyncSession):
 
 
 async def register_user(user, session: AsyncSession):
-
     fetched_user = await find_existed_user(user.email, session)
     if fetched_user:
         return {"status_code": 400, "message": "User already signed up!"}
