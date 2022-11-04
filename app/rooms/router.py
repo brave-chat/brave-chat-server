@@ -22,6 +22,8 @@ from app.rooms.crud import (
     send_new_room_message,
 )
 from app.rooms.schemas import (
+    DeleteRoomConversation,
+    LeaveRoom,
     RoomCreate,
 )
 from app.users.schemas import (
@@ -112,14 +114,14 @@ async def send_room_message(
     },
 )
 async def leave_room(
-    room: str,
+    room: LeaveRoom,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     Leave a room.
     """
-    results = await leave_room_user(currentUser.id, room, session)
+    results = await leave_room_user(currentUser.id, room.room_name, session)
     return results
 
 
@@ -141,14 +143,16 @@ async def leave_room(
     },
 )
 async def delete_room_chat(
-    room: str,
+    room_name: DeleteRoomConversation,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
     delete a room chat.
     """
-    results = await delete_room_user_chat(currentUser.id, room, session)
+    results = await delete_room_user_chat(
+        currentUser.id, room_name.room_name, session
+    )
     return results
 
 

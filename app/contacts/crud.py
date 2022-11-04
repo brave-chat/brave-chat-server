@@ -189,13 +189,26 @@ async def search_user_contacts(
     search: str, user_id: int, session: AsyncSession
 ):
     user = await find_existed_user_contact(user_id, session)
-    if not search:
-        results = {
-            "status_code": 400,
-            "result": "You can't search against an empty string!",
-        }
+    if not search or len(search) == 0:
+        query = """
+            SELECT
+              *
+            FROM
+              contacts
+            LEFT JOIN
+              users
+            ON
+              contacts.contact= users.id
+            WHERE
+              contacts.user= :user_id
+        """
+        values = {"user_id": user_id}
+        result = await session.execute(text(query), values)
+        return_results = result.fetchall()
+        results = {"status_code": 200, "result": return_results}
         return results
-    if user:
+
+    elif user and search:
         # TODO: CONCAT(*, :search, *)
         query = """
             SELECT
@@ -223,4 +236,5 @@ async def search_user_contacts(
         return_results = result.fetchall()
         results = {"status_code": 200, "result": return_results}
         return results
+
     return {"status_code": 400, "message": "User not found!"}

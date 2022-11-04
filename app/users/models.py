@@ -3,13 +3,11 @@ from pydantic import (
     EmailStr,
 )
 from sqlalchemy import (
-    JSON,
     Column,
     Integer,
     String,
 )
 from typing import (
-    Any,
     Optional,
 )
 
@@ -55,4 +53,3 @@ class Users(Base, CommonMixin, TimestampMixin):
         Integer, index=True, nullable=True
     )
     user_role: Optional[UserRole] = Column(String(20), nullable=True)
-    location: Optional[Any] = Column(JSON, nullable=True)

@@ -1,4 +1,5 @@
 import datetime
+from deta import Deta
 import logging
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.sql import (
     text,
 )
+import uuid
 
 from app.auth.crud import (
     find_existed_user,
@@ -18,6 +20,12 @@ from app.users.schemas import (
 )
 
 logger = logging.getLogger(__name__)
+
+# initialize with a project key
+deta = Deta("a0f73ypa_u9uCsaRjEzav96nSAy6VuvDb5xMXxj83")
+
+# create and use as many Drives as you want!
+images = deta.Drive("sent-images")
 
 
 async def find_existed_user_messages(
@@ -49,10 +57,49 @@ async def send_new_message(
     room_id: int,
     session: AsyncSession,
 ):
-    # Check for empty message
-    if isinstance(request, str) and file:
-        # TODO: file upload
-        ...
+    if request.message_type == "media":
+        if not room_id:
+            if not request.media["preview"]:
+                return {
+                    "status_code": 400,
+                    "message": "You can't upload an empty file!",
+                }
+            receiver = await find_existed_user(
+                email=request.receiver, session=session
+            )
+            file_name = f"/chat/images/user/{str(sender_id)}/image_{str(uuid.uuid4())}.png"
+            images.put(file_name, file)
+            # create a new message
+            query = """
+                INSERT INTO messages (
+                  sender,
+                  receiver,
+                  content,
+                  message_type,
+                  media,
+                  status,
+                  creation_date
+                )
+                VALUES (
+                  :sender,
+                  :receiver,
+                  :content,
+                  :message_type,
+                  :media,
+                  1,
+                  :creation_date
+                )
+            """
+            values = {
+                "sender": sender_id,
+                "receiver": receiver.id,
+                "content": request.content,
+                "message_type": request.message_type,
+                "media": file_name,
+                "creation_date": datetime.datetime.utcnow(),
+            }
+        await session.execute(text(query), values)
+        return file_name
     else:
         if not room_id:
             if not request.content:
@@ -161,19 +208,82 @@ async def delete_room_messages(
     if not messages:
         return {
             "status_code": 400,
-            "message": "There is no message to delete!",
+            "message": "There are no messages to delete!",
         }
     else:
         query = """
-            DELETE
-            FROM
+            UPDATE
               messages
+            SET
+              content = "<em>Deleted Message!</em>",
+              modified_date = :modified_date
             WHERE
               sender = :sender_id
             AND
               room = :room_id
         """
-        values = {"sender_id": sender_id, "room_id": room_id}
+        values = {
+            "sender_id": sender_id,
+            "room_id": room_id,
+            "modified_date": datetime.datetime.utcnow(),
+        }
+
+        await session.execute(text(query), values)
+
+        results = {
+            "status_code": 200,
+            "message": "Your messages have been deleted successfully!",
+        }
+
+    return results
+
+
+async def delete_chat_messages(
+    sender_id: int,
+    receiver: str,
+    session: AsyncSession,
+):
+    receiver = await find_existed_user(email=receiver, session=session)
+    if not receiver:
+        return {
+            "status_code": 400,
+            "message": "Contact not found!",
+        }
+    query = """
+        SELECT
+            *
+        FROM
+            messages
+        WHERE
+          sender = :sender_id
+        AND
+          receiver = :receiver_id
+    """
+    values = {"sender_id": sender_id, "receiver_id": receiver.id}
+    result = await session.execute(text(query), values)
+    messages = result.fetchall()
+    if not messages:
+        return {
+            "status_code": 400,
+            "message": "There are no messages to delete!",
+        }
+    else:
+        query = """
+            UPDATE
+              messages
+            SET
+              content = "<em>Deleted Message!</em>",
+              modified_date = :modified_date
+            WHERE
+              sender = :sender_id
+            AND
+              receiver = :receiver_id
+        """
+        values = {
+            "sender_id": sender_id,
+            "receiver_id": receiver.id,
+            "modified_date": datetime.datetime.utcnow(),
+        }
 
         await session.execute(text(query), values)
 
@@ -255,11 +365,12 @@ async def get_chats_user(user_id: int, search, session: AsyncSession):
         # get all contacts for each user.
         query = """
             SELECT
-              messages.id as id,
+              messages.id as message_id,
               content,
               MAX(messages.creation_date) OVER(PARTITION BY users.email) AS last_message_time,
               SUM(status) OVER(PARTITION BY users.email) AS nb_unread_message,
-              users.id as user_id,
+              SUM(status) OVER() AS nb_total_unread_message,
+              users.id as id,
               users.first_name,
               users.last_name,
               users.bio,

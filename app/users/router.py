@@ -1,6 +1,8 @@
+from deta import Deta
 from fastapi import (
     APIRouter,
     Depends,
+    responses,
 )
 from fastapi.encoders import (
     jsonable_encoder,
@@ -12,6 +14,9 @@ from sqlalchemy.ext.asyncio import (
 from app.auth.schemas import (
     UserSchema,
 )
+from app.config import (
+    settings,
+)
 from app.users import (
     crud as user_crud,
 )
@@ -20,6 +25,7 @@ from app.users.models import (
 )
 from app.users.schemas import (
     PersonalInfo,
+    ResetPassword,
     UpdateStatus,
     UserObjectSchema,
 )
@@ -30,6 +36,10 @@ from app.utils.dependencies import (
     get_db_autocommit_session,
     get_db_transactional_session,
 )
+
+deta = Deta(settings.DETA_PROJECT_KEY)
+
+sent_images = deta.Drive("profile-images")
 
 router = APIRouter(prefix="/api/v1")
 
@@ -91,3 +101,26 @@ async def update_user_status(
         "status_code": 200,
         "message": "Status has been updated successfully!",
     }
+
+
+@router.put("/user/reset-password")
+async def reset_user_password(
+    request: ResetPassword,
+    currentUser=Depends(jwt_util.get_current_active_user),
+    session: AsyncSession = Depends(get_db_transactional_session),
+):
+    result = await user_crud.update_user_password(
+        request, currentUser, session
+    )
+    return result
+
+
+@router.get("/user/profile/{name}")
+async def get_profile_image(name: str):
+    try:
+        img = sent_images.get(f"user/{name}/profile.png")
+        return responses.StreamingResponse(
+            img.iter_chunks(), media_type="image/png"
+        )
+    except Exception as e:
+        return {"status_code": 400, "message": str(e)}

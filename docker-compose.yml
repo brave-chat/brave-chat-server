@@ -45,7 +45,7 @@ services:
     depends_on:
       - lb
     ports:
-      - 3000:3000
+      - 3001:3000
     volumes:
       - ./datasource.yml:/etc/grafana/provisioning/datasource.yml
     env_file:
