@@ -20,6 +20,9 @@ from pydantic import (
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
+from typing import (
+    Dict,
+)
 
 from app.auth import (
     crud,
@@ -48,8 +51,8 @@ def get_token_user(token: str = Depends(oauth2_scheme)) -> str:
 
 
 async def create_access_token(
-    *, data: dict, expires_delta: timedelta = None
-) -> dict[str, str]:
+    *, data: Dict[str, str], expires_delta: timedelta = None
+) -> Dict[str, str]:
     try:
         payload = data.copy()
         if expires_delta:

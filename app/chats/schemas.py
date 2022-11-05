@@ -4,6 +4,8 @@ from pydantic import (
 )
 from typing import (
     Any,
+    Dict,
+    List,
     Optional,
 )
 
@@ -36,7 +38,7 @@ class MessageCreateRoom(BaseModel):
 
 class GetAllMessageResults(BaseModel):
     status_code: int = Field(..., example=200)
-    result: list[dict[str, Any]]
+    result: List[Dict[str, Any]]
 
 
 class DeleteChatMessages(BaseModel):

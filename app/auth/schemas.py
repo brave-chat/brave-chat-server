@@ -4,6 +4,7 @@ from pydantic import (
     Field,
 )
 from typing import (
+    Dict,
     Optional,
 )
 
@@ -28,7 +29,7 @@ class UserSchema(BaseModel):
             profile_picture="{'preview': 'http://www.example.com/image', 'metaData': 'size, type...'}",
         ),
     )
-    token: Optional[dict[str, str]] = Field(
+    token: Optional[Dict[str, str]] = Field(
         ..., example="Token value(e.g. 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9')"
     )
     status_code: int = Field(

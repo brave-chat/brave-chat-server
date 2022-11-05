@@ -4,6 +4,8 @@ from pydantic import (
     Field,
 )
 from typing import (
+    Dict,
+    List,
     Union,
 )
 
@@ -15,16 +17,16 @@ class RoomCreate(BaseModel):
 
 class RoomCreateResult(BaseModel):
     room_name: str
-    members: list[str]
-    conversation: list[str]
+    members: List[str]
+    conversation: List[str]
     active: str
     creation_date: datetime.datetime
 
 
 class RoomGetALL(BaseModel):
     room_name: str
-    members: list[dict[str, Union[str, datetime.datetime]]]
-    messages: list[dict[str, Union[str, datetime.datetime]]]
+    members: List[Dict[str, Union[str, datetime.datetime]]]
+    messages: List[Dict[str, Union[str, datetime.datetime]]]
     active: str
     creation_date: datetime.datetime
 
