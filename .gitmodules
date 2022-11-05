@@ -1,0 +1,3 @@
+[submodule "brave-chat"]
+	path = brave-chat
+	url = https://github.com/brave-chat/brave-chat

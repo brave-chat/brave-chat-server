@@ -1,15 +1,15 @@
 # Brave Chat Server
 
-![Vercel](https://vercelbadge.vercel.app/api/wiseaidev/fastapi-singlestore-backend)
+![Vercel](https://vercelbadge.vercel.app/api/brave-chat/brave-chat-server)
 ![Codeql](https://github.com/github/docs/actions/workflows/codeql.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/wiseaidev/fastapi-singlestore-backend/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/wiseaidev/fastapi-singlestore-backend/tree/main)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/wiseaidev/fastapi-singlestore-backend/main.svg)](https://results.pre-commit.ci/latest/github/wiseaidev/fastapi-singlestore-backend/main)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/brave-chat/brave-chat-server/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/brave-chat/brave-chat-server/tree/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/brave-chat/brave-chat-server/main.svg)](https://results.pre-commit.ci/latest/github/brave-chat/brave-chat-server/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[![Architecture](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/32lsb1pwom7ch3yx0yxi.jpg)](https://github.com/wiseaidev/fastapi-singlestore-backend)
+[![Architecture](https://github.com/brave-chat/brave-chat/blob/main/docs/static/images/architecture.png)](https://github.com/brave-chat/brave-chat-server)
 
-A Fully Async based backend for the [react chat application](https://github.com/wiseaidev/chat). It is a multi-model server that is fully functional and supports all the usual messaging app capabilities such as of one-on-one (private) and room messaging. It enables users to send text and multimedia messages(e.g. images). Also, users can freely create, join, and leave chat rooms where everyone can message each other.
+A Fully Async based backend for [Brave Chat](https://github.com/brave-chat/brave-chat). It is a multi-model server that is fully functional and supports all the usual messaging app capabilities such as of one-on-one (private) and room messaging. It enables users to send text and multimedia messages(e.g. images). Also, users can freely create, join, and leave chat rooms where everyone can message each other.
 
 ## Table of Contents
 
@@ -282,7 +282,7 @@ docker compose up
 
 To use the Deta version of the APIs you'll need to create a Deta account.
 
-[![Deploy on Deta](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/wiseaidev/fastapi-singlestore-backend)
+[![Deploy on Deta](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/brave-chat/brave-chat-server)
 
 #### Deta CLI (Not Possible)
 
@@ -316,7 +316,7 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 ### Heroku
 
-[![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
+[![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/brave-chat/brave-chat-server)
 
 #### Heroku CLI (Not Possible)
 
@@ -386,7 +386,7 @@ Todo: Figure out a better way to deploy multiple containers on Heroku because th
 
 This project makes use of WebSockets, which are unforunately not supported by Vercel's serverless functions.
 
-[![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/wiseaidev/fastapi-singlestore-backend)
+[![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/brave-chat/brave-chat-server)
 
 ### Netlify (Not Possible)
 
@@ -394,7 +394,7 @@ This project makes use of WebSockets, which are unforunately not supported by Ne
 
 Additionally, running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is currently allowed on Netlify, which means that you can only deploy statically generated websites like docs and such. I tried to hack my way around it by creating a serverless function that executes `uvicorn main:app --reload` in the background. However, the serverless function is being deployed on a different environment.
 
-[![Deploy on Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/wiseaidev/fastapi-singlestore-backend)
+[![Deploy on Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/brave-chat/brave-chat-server)
 
 ## Core Dependencies
 
@@ -424,4 +424,4 @@ This project is open for anyone to contribute:
 
 ## License
 
-This project and the accompanying materials are made available under the terms and conditions of the [`MIT LICENSE`](https://github.com/wiseaidev/fastapi-singlestore-backend/blob/main/LICENSE).
+This project and the accompanying materials are made available under the terms and conditions of the [`MIT LICENSE`](https://github.com/brave-chat/brave-chat-server/blob/main/LICENSE).
