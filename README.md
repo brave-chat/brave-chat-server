@@ -63,7 +63,7 @@ This project supports the following features:
 ## Development Requirements
 
 - Make (GNU command)
-- Python (>= 3.8)
+- Python (>= 3.9)
 - Poetry (1.2)
 
 ## Project Structure
