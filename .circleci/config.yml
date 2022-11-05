@@ -35,6 +35,11 @@ aliases:
         echo export SINGLESTORE_HOST=${SINGLESTORE_HOST} >> ./.env
         echo export SINGLESTORE_PORT=${SINGLESTORE_PORT} >> ./.env
         echo export SINGLESTORE_DATABASE=${SINGLESTORE_DATABASE} >> ./.env
+        echo export REDIS_USERNAME=${REDIS_USERNAME} >> ./.env
+        echo export REDIS_PASSWORD=${REDIS_PASSWORD} >> ./.env
+        echo export REDIS_HOST=${REDIS_HOST} >> ./.env
+        echo export REDIS_PORT=${REDIS_PORT} >> ./.env
+        echo export DETA_PROJECT_KEY=${DETA_PROJECT_KEY} >> ./.env
 
 jobs:
   testing:
