@@ -6,9 +6,17 @@ version: 2.0
 orbs:
   coveralls: coveralls/coveralls@1.0.4
 aliases:
-  - &container_python
+  - &container_python39
     docker:
       - image: cimg/python:3.9.10 # primary container for the build job
+    environment:
+      TOXENV: py39
+
+  - &container_python38
+    docker:
+      - image: cimg/python:3.8.10
+    environment:
+      TOXENV: py38
 
   - &run_task_install_tox_dependencies
     run:
@@ -17,12 +25,19 @@ aliases:
         sudo apt-get -qq update
         sudo apt install -y build-essential libssl-dev libpython2-dev python3-pip
         sudo pip3 install tox
-  - &run_task_install_dependencies_poetry
+  - &run_task_install_dependencies_poetry_python39
     run:
       name: Setup, install Poetry & dependencies
       command: |
         curl -sSL https://install.python-poetry.org | python3 - --version 1.2.2
         poetry env use 3.9.10
+        poetry install
+  - &run_task_install_dependencies_poetry_python38
+    run:
+      name: Setup, install Poetry & dependencies
+      command: |
+        curl -sSL https://install.python-poetry.org | python3 - --version 1.2.2
+        poetry env use 3.8.10
         poetry install
   - &set_env_vars
     run:
@@ -42,8 +57,9 @@ aliases:
         echo export DETA_PROJECT_KEY=${DETA_PROJECT_KEY} >> ./.env
 
 jobs:
-  testing:
-    <<: *container_python
+
+  testing_python38:
+    <<: *container_python38
     steps:
       # Get the code
       - checkout
@@ -52,7 +68,7 @@ jobs:
           keys:
             - deps-{{ checksum "poetry.lock" }}
       - *run_task_install_tox_dependencies
-      - *run_task_install_dependencies_poetry
+      - *run_task_install_dependencies_poetry_python38
       - *set_env_vars
       - save_cache:
           key: deps-{{ checksum "poetry.lock" }}
@@ -61,7 +77,30 @@ jobs:
       - run:
           name: run tests
           command: |
-            tox -v
+            tox -r
+      - store_test_results:
+          path: .tox/test/tmp/reports
+
+  testing_python39:
+    <<: *container_python39
+    steps:
+      # Get the code
+      - checkout
+      # Cache
+      - restore_cache:
+          keys:
+            - deps-{{ checksum "poetry.lock" }}
+      - *run_task_install_tox_dependencies
+      - *run_task_install_dependencies_poetry_python39
+      - *set_env_vars
+      - save_cache:
+          key: deps-{{ checksum "poetry.lock" }}
+          paths:
+            - /home/circleci/.cache/pypoetry/virtualenvs
+      - run:
+          name: run tests
+          command: |
+            tox -r
       - store_test_results:
           path: .tox/test/tmp/reports
 
@@ -69,4 +108,5 @@ workflows:
   version: 2
   test:
     jobs:
-      - testing
+      - testing_python38
+      - testing_python39
