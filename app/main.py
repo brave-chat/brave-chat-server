@@ -137,25 +137,15 @@ def set_multiproc_dir() -> None:
 
 
 logger = logging.getLogger(__name__)
-# change this if in production
-if not settings.DEBUG:
-    chat_app = FastAPI(
-        docs_url="/docs",
-        redoc_url="/redocs",
-        title="Realtime Chat App",
-        description="Realtime Chat App Backend",
-        version="1.0",
-        openapi_url="/api/v1/openapi.json",
-    )
-else:
-    chat_app = FastAPI(
-        docs_url="/docs",
-        redoc_url="/redocs",
-        title="Realtime Chat App",
-        description="Realtime Chat App Backend",
-        version="1.0",
-        openapi_url="/api/v1/openapi.json",
-    )
+
+chat_app = FastAPI(
+    docs_url="/docs",
+    redoc_url="/redocs",
+    title="Brave Chat Server",
+    description="The server side of Brave Chat.",
+    version="1.0",
+    openapi_url="/api/v1/openapi.json",
+)
 
 origins = [
     "http://127.0.0.1:8000",
@@ -163,6 +153,8 @@ origins = [
     "http://localhost:8000",
     "http://localhost:3000",
 ]
+
+origins.extend(settings.origins)
 
 chat_app.add_middleware(
     CORSMiddleware,
@@ -194,7 +186,7 @@ async def shutdown():
 
 @chat_app.get("/api")
 async def root():
-    return {"message": "Welcome to this blazingly fast realtime chat app."}
+    return {"message": "Welcome to the Brave Chat Server."}
 
 
 chat_app.include_router(auth_router.router, tags=["Auth"])

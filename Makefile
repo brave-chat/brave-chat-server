@@ -15,6 +15,9 @@ help:
 	@echo "lint                     Check style with pre-commit"
 	@echo "test                     Run tests quickly with pytest"
 	@echo "test-all                 Run tests on every Python version with tox"
+	@echo "build                    Build docker containers services"
+	@echo "up                       Spin up the built containers"
+	@echo "down                     Stop all running containers"
 	@echo "coverage                 Check code coverage quickly with the default Python"
 
 clean: clean-build clean-pyc clean-test
@@ -142,13 +145,10 @@ deploy-deta:
 	deta update -e .env
 	@echo ""
 
-release: dist ## package and upload a release
-	poetry publish
-
 dist: clean ## builds source and wheel package
 	poetry build
 
-docker-build:
+build:
 	docker compose build
 
 up:

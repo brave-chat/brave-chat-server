@@ -55,7 +55,7 @@ async def get_user_profile(
         "token": None,
         "user": UserObjectSchema(**jsonable_encoder(currentUser)),
         "status_code": 200,
-        "message": "Welcome to this blazingly fast chat app.",
+        "message": "Welcome to Brave Chat.",
     }
     return results
 

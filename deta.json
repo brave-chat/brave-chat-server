@@ -1,5 +1,5 @@
 {
-  "description": "A fully async based backend for the chat application built using FastAPI, SingleStore with aiomysql, databases, pydantic, SQLAlchemy, and Deta.",
+  "description": "A fully async based backend for Brave Chat built using FastAPI, SingleStore, databases, pydantic, SQLAlchemy, Redis, and Deta.",
   "env": [
     {
       "description": "This is the user name you'll be creating for remote accesses. By default, this variable is equal to admin.",
@@ -57,8 +57,13 @@
       "key": "REDIS_PORT",
       "required": false,
       "value": "15065"
+    },
+    {
+      "description": "Your Deta project key.",
+      "key": "DETA_PROJECT_KEY",
+      "required": true
     }
   ],
-  "name": "chat-app-backend",
+  "name": "brave-chat",
   "runtime": "python3.9"
 }

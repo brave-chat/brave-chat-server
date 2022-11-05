@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "chat-app-backend"
+name = "brave-chat-server"
 version = "0.1.0"
-description = "A fully async based backend for the chat application built using FastAPI, SingleStore, Pydantic, SQLAlchemy, and Deta."
+description = "A fully async based backend for Brave Chat built using FastAPI, SingleStore, Pydantic, SQLAlchemy, Redis Pub/Sub, and Deta."
 authors = ["wiseaidev <business@wiseai.dev>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/wiseaidev/fastapi-singlestore-backend"
-homepage = "https://github.com/wiseaidev/fastapi-singlestore-backend"
+repository = "https://github.com/brave-chat/brave-chat-server"
+homepage = "https://github.com/brave-chat/brave-chat-server"
 documentation = ""
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
 ]
-keywords = ["python", "fastapi", "singlestore", "aiomysql", "SQLAlchemy", "Deta", "chat app"]
+keywords = ["python", "fastapi", "singlestore", "aiomysql", "SQLAlchemy", "Deta", "chat app", "Brave Chat"]
 packages = [
     { include = "app", from = "." },
 ]

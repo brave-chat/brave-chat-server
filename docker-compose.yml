@@ -9,6 +9,18 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
 
+  client:
+    build:
+      context: brave-chat
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./brave-chat:/brave-chat
+    depends_on:
+      - lb
+
   app1:
     build: .
     env_file:

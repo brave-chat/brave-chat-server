@@ -33,6 +33,7 @@ A Fully Async based backend for [Brave Chat](https://github.com/brave-chat/brave
 - [Access Redocs Documentation](#access-redocs-documentation)
 - [Access Prometheus Metrics](#access-prometheus-metrics)
 - [Access Grafana Dashboard](#access-grafana-dashboard)
+- [Access The Client](#access-the-client)
 - [Cloud Deployments](#cloud-deployments)
   - [Deta Micros (Not Possible)](#deta-micros-not-possible)
   - [Heroku](#heroku)
@@ -136,6 +137,9 @@ lint                     Check style with pre-commit
 test                     Run tests quickly with pytest
 test-all                 Run tests on every Python version with tox
 coverage                 Check code coverage quickly with the default Python
+build                    Build docker containers services
+up                       Spin up the containers
+down                     Stop all running containers
 ```
 
 ### 1. Create a virtualenv
@@ -232,12 +236,18 @@ make run
 
 ## Running locally with Compose v2
 
-Make sure your have [compose v2](https://github.com/docker/compose) installed and configured on your machine, and run the following command to build the predefined docker services(make sure you have a .env file beforehand):
+First thing first, to run the entire platform, you have to clone the `brave-chat` submodule using the following command:
+
+```sh
+git submodule update --init --recursive
+```
+
+Once that done, make sure your have [compose v2](https://github.com/docker/compose) installed and configured on your machine, and run the following command to build the predefined docker services(make sure you have a .env file beforehand):
 
 **Using Make**
 
 ```sh
-make docker-build
+make build
 ```
 
 or simply running:
@@ -246,7 +256,7 @@ or simply running:
 docker compose build
 ```
 
-Once that is done, you can spin up the container:
+Once that is done, you can spin up the containers:
 
 **Using Make**
 
@@ -258,6 +268,18 @@ or running:
 
 ```
 docker compose up
+```
+
+Wait untill the client service become available:
+
+```sg
+brave-chat-server-client-1      | Starting the development server...
+```
+
+You can stop the running containers but issuing the following command on a separate terminal session:
+
+```
+make down
 ```
 
 ## Access Swagger Documentation
@@ -275,6 +297,10 @@ docker compose up
 ## Access Grafana Dashboard
 
 > <http://localhost:3001>
+
+## Access The Client
+
+> <http://localhost:3000>
 
 ## Cloud Deployments
 
@@ -354,10 +380,10 @@ Build your container images:
 
 ```sh
 docker build tag lb -f Dockerfile.haproxy
-docker tag app1 registry.heroku.com/fastapi-singlestore-backend_app1/web
-docker tag app2 registry.heroku.com/fastapi-singlestore-backend_app2/web
-docker tag app3 registry.heroku.com/fastapi-singlestore-backend_app3/web
-docker tag app4 registry.heroku.com/fastapi-singlestore-backend_app4/web
+docker tag app1 registry.heroku.com/brave-chat-server_app1/web
+docker tag app2 registry.heroku.com/brave-chat-server_app2/web
+docker tag app3 registry.heroku.com/brave-chat-server_app3/web
+docker tag app4 registry.heroku.com/brave-chat-server_app4/web
 ```
 
 Push containers to docker hub:
