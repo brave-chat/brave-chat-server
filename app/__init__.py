@@ -1,6 +1,6 @@
 """
-A fully async based backend for the chat application built using FastAPI,
-SingleStore, databases[aiomysql], pydantic, SQLAlchemy, and Deta.
+A fully async based server for Brave Chat built using FastAPI,
+SingleStore, pydantic, SQLAlchemy, Redis, and Deta.
 """
 
 

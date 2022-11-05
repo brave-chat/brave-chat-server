@@ -4,8 +4,12 @@
       "url": "heroku/python"
     }
   ],
-  "description": "A fully async based backend for the chat application built using FastAPI, SingleStore with aiomysql, databases, pydantic, SQLAlchemy, and Deta.",
+  "description": "A fully async based backend for Brave Chat built using FastAPI, SingleStore, pydantic, SQLAlchemy, Redis, and Deta.",
   "env": {
+    "DETA_PROJECT_KEY": {
+      "description": "The project key of your Deta account.",
+      "required": true
+    },
     "JWT_SECRET_KEY": {
       "description": "Secret used to sign the JWTs",
       "generator": "secret",
@@ -66,7 +70,7 @@
     "deta",
     "api"
   ],
-  "name": "chat-app-backend",
-  "repository": "https://github.com/wiseaidev/fastapi-singlestore-backend",
+  "name": "brave-chat-server",
+  "repository": "https://github.com/brave-chat/brave-chat-server",
   "success_url": "/docs"
 }

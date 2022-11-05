@@ -21,5 +21,5 @@ async def test_health(client: AsyncClient, fastapi_app: FastAPI) -> None:
     """
     url = fastapi_app.url_path_for("root")
     response = await client.get(url)
-    assert b"Welcome to this blazingly fast" in response.content
+    assert b"Welcome to Brave Chat" in response.content
     assert response.status_code == status.HTTP_200_OK

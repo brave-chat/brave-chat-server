@@ -1,19 +1,19 @@
 {
   "author": "wiseaidev",
   "bugs": {
-    "url": "https://github.com/wiseaidev/fastapi-singlestore-backend/issues"
+    "url": "https://github.com/brave-chat/brave-chat-server/issues"
   },
-  "description": "The server part of the chat app powered by FastAPI and Singlestore.",
+  "description": "The server part of Brave Chat powered by FastAPI, Redis, SingleStore, and friends.",
   "directories": {
     "test": "tests"
   },
-  "homepage": "https://github.com/wiseaidev/fastapi-singlestore-backend#readme",
+  "homepage": "https://github.com/brave-chat/brave-chat-server#readme",
   "license": "MIT",
   "main": "index.js",
-  "name": "fastapi-singlestore-backend",
+  "name": "brave-chat-server",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wiseaidev/fastapi-singlestore-backend.git"
+    "url": "git+https://github.com/brave-chat/brave-chat-server.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

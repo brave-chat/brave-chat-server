@@ -165,8 +165,8 @@ async def fastapi_app(
     chat_app = FastAPI(
         docs_url="/docs",
         redoc_url="/redocs",
-        title="Realtime Chat App",
-        description="Realtime Chat App Backend",
+        title="Brave Chat",
+        description="Brave Chat Server.",
         version="1.0",
         openapi_url="/api/v1/openapi.json",
     )
@@ -177,7 +177,7 @@ async def fastapi_app(
 
     @chat_app.get("/api")
     async def root():
-        return {"message": "Welcome to this blazingly fast realtime chat app."}
+        return {"message": "Welcome to Brave Chat server."}
 
     chat_app.include_router(auth_router.router, tags=["Auth"])
     chat_app.include_router(users_router.router, tags=["User"])
