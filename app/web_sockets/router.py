@@ -67,7 +67,9 @@ async def websocket_room_endpoint(
         logger.error(message)
         logger.warning("Disconnecting Websocket")
         await websocket.close()
-        await conn.close()
+        if conn:
+            await conn.close()
+            del conn
 
 
 @router.websocket("/ws/chat/{sender_id}/{receiver_id}")
@@ -109,4 +111,6 @@ async def websocket_contact_chat_endpoint(
         logger.error(message)
         logger.warning("Disconnecting Websocket")
         await websocket.close()
-        await conn.close()
+        if conn:
+            await conn.close()
+            del conn

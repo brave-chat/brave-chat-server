@@ -2,6 +2,8 @@ from deta import Deta
 from fastapi import (
     APIRouter,
     Depends,
+    File,
+    UploadFile,
     responses,
 )
 from fastapi.encoders import (
@@ -39,7 +41,7 @@ from app.utils.dependencies import (
 
 deta = Deta(settings.DETA_PROJECT_KEY)
 
-sent_images = deta.Drive("profile-images")
+profile_images = deta.Drive("profile-images")
 
 router = APIRouter(prefix="/api/v1")
 
@@ -115,10 +117,42 @@ async def reset_user_password(
     return result
 
 
-@router.get("/user/profile/{name}")
+@router.get("/user/profile-image/{name}")
 async def get_profile_image(name: str):
     try:
-        img = sent_images.get(f"user/{name}/profile.png")
+        img = profile_images.get(f"user/{name}/profile.png")
+        return responses.StreamingResponse(
+            img.iter_chunks(), media_type="image/png"
+        )
+    except Exception as e:
+        return {"status_code": 400, "message": str(e)}
+
+
+@router.put("/user/profile-image")
+async def upload_profile_image(
+    file: UploadFile = File(...),
+    currentUser: UserObjectSchema = Depends(jwt_util.get_current_active_user),
+    session: AsyncSession = Depends(get_db_transactional_session),
+):
+    try:
+        file_name = "user/" + str(currentUser.id) + "/" + "profile.png"
+        profile_images.put(file_name, file.file)
+        await user_crud.update_profile_picture(
+            email=currentUser.email, file_name=file_name, session=session
+        )
+        return {
+            "status_code": 200,
+            "message": "Profile picture has been updated!",
+        }
+
+    except Exception as e:
+        return {"status_code": 400, "message": str(e)}
+
+
+@router.get("/profile/user/{user_id}/profile.png")
+async def get_profile_user_image(user_id: int):
+    try:
+        img = profile_images.get(f"user/{user_id}/profile.png")
         return responses.StreamingResponse(
             img.iter_chunks(), media_type="image/png"
         )

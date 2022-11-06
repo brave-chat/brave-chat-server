@@ -21,13 +21,12 @@ async def create_new_contact(
     if not contact:
         return {
             "status_code": 400,
-            "message": "You can't add a non existing user to"
-            " your contact list!",
+            "message": "User not registered!",
         }
     elif contact.id == user_id:
         return {
             "status_code": 400,
-            "message": "You can't add yourself to your contact list!",
+            "message": "You can't add yourself!",
         }
     query = """
         SELECT

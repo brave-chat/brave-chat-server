@@ -118,6 +118,23 @@ async def get_chats_user_list(
     return results
 
 
+@router.get(
+    "/contacts/chat/search/{search}",
+    status_code=200,
+    name="chats:get-user-chat-list",
+)
+async def get_chats_user_search_list(
+    search: str,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    """
+    Get all chats for an authenticated user.
+    """
+    results = await get_chats_user(currentUser.id, search, session)
+    return results
+
+
 @router.delete(
     "/user/chat",
     status_code=200,

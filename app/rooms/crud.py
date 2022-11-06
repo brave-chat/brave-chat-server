@@ -113,7 +113,7 @@ async def delete_room_user(user_id: int, room_id: int, session: AsyncSession):
 
 
 async def create_assign_new_room(
-    user_id: int, room_obj, session: AsyncSession, join=False
+    user_id: int, room_obj, session: AsyncSession
 ):
     if not room_obj.room_name:
         results = {
@@ -123,10 +123,15 @@ async def create_assign_new_room(
         return results
     room = await find_existed_room(room_obj.room_name, session)
     if not room:
-        if not join:
+        if not room_obj.join:
             await create_room(
                 room_obj.room_name, room_obj.description, session
             )
+        else:
+            return {
+                "status_code": 400,
+                "message": "Room not found!",
+            }
         logger.info(f"Creating room `{room_obj.room_name}`.")
         room = await find_existed_room(room_obj.room_name, session)
         user = await find_existed_user_in_room(user_id, room.id, session)
@@ -150,14 +155,14 @@ async def create_assign_new_room(
 
     else:
         user = await find_existed_user_in_room(user_id, room.id, session)
-        if user:
+        if user and room_obj.join:
             logger.info(f"`{user_id}` has already joined this room!")
             results = {
                 "status_code": 400,
                 "message": "You have already joined room "
                 f"{room_obj.room_name}!",
             }
-        else:
+        elif not user and not room_obj.join:
             await join_room(user_id, room.id, session)
             logger.info(
                 f"Adding {user_id} to room `{room_obj.room_name}` as a member."
@@ -165,6 +170,12 @@ async def create_assign_new_room(
             results = {
                 "status_code": 200,
                 "message": f"You have joined room {room_obj.room_name}!",
+            }
+        else:
+            logger.info("This room already exists.")
+            results = {
+                "status_code": 400,
+                "message": "This room already exists. Join it, perhaps?",
             }
         return results
 

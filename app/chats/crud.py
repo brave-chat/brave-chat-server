@@ -15,16 +15,17 @@ from app.auth.crud import (
 from app.chats.schemas import (
     MessageCreate,
 )
+from app.config import (
+    settings,
+)
 from app.users.schemas import (
     UserObjectSchema,
 )
 
 logger = logging.getLogger(__name__)
 
-# initialize with a project key
-deta = Deta("a0f73ypa_u9uCsaRjEzav96nSAy6VuvDb5xMXxj83")
+deta = Deta(settings.DETA_PROJECT_KEY)
 
-# create and use as many Drives as you want!
 images = deta.Drive("sent-images")
 
 
@@ -359,35 +360,67 @@ async def get_sender_receiver_messages(
 
 
 async def get_chats_user(user_id: int, search, session: AsyncSession):
-    search = search.lower
     messages = await find_existed_user_messages(user_id, session)
     if messages:
         # get all contacts for each user.
-        query = """
-            SELECT
-              messages.id as message_id,
-              content,
-              MAX(messages.creation_date) OVER(PARTITION BY users.email) AS last_message_time,
-              SUM(status) OVER(PARTITION BY users.email) AS nb_unread_message,
-              SUM(status) OVER() AS nb_total_unread_message,
-              users.id as id,
-              users.first_name,
-              users.last_name,
-              users.bio,
-              users.chat_status,
-              users.email,
-              users.phone_number,
-              users.profile_picture
-            FROM
-              messages
-            LEFT JOIN
-              users
-            ON
-              messages.sender = users.id
-            WHERE
-              messages.receiver = :user_id
-        """
-        values = {"user_id": user_id}
+        if search:
+            query = """
+                SELECT
+                  messages.id as message_id,
+                  content,
+                  MAX(messages.creation_date) OVER(PARTITION BY users.email) AS last_message_time,
+                  SUM(status) OVER(PARTITION BY users.email) AS nb_unread_message,
+                  SUM(status) OVER() AS nb_total_unread_message,
+                  users.id as id,
+                  users.first_name,
+                  users.last_name,
+                  users.bio,
+                  users.chat_status,
+                  users.email,
+                  users.phone_number,
+                  users.profile_picture
+                FROM
+                  messages
+                LEFT JOIN
+                  users
+                ON
+                  messages.sender = users.id
+                WHERE
+                  messages.receiver = :user_id
+                AND
+                  INSTR(users.first_name, :search) > 0
+                ORDER BY
+                  messages.creation_date
+            """
+            values = {"user_id": user_id, "search": search}
+        else:
+            query = """
+                SELECT
+                  messages.id as message_id,
+                  content,
+                  MAX(messages.creation_date) OVER(PARTITION BY users.email) AS last_message_time,
+                  SUM(status) OVER(PARTITION BY users.email) AS nb_unread_message,
+                  SUM(status) OVER() AS nb_total_unread_message,
+                  users.id as id,
+                  users.first_name,
+                  users.last_name,
+                  users.bio,
+                  users.chat_status,
+                  users.email,
+                  users.phone_number,
+                  users.profile_picture
+                FROM
+                  messages
+                LEFT JOIN
+                  users
+                ON
+                  messages.sender = users.id
+                WHERE
+                  messages.receiver = :user_id
+                ORDER BY
+                  messages.creation_date
+            """
+            values = {"user_id": user_id}
         result = await session.execute(text(query), values)
         contacts = result.fetchall()
         # HAVING after a window function is not supported by SINGLESTORE

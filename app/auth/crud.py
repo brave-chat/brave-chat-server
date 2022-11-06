@@ -153,7 +153,6 @@ async def register_user(user, session: AsyncSession):
         "user": UserObjectSchema(**jsonable_encoder(user)),
         "token": access_token,
         "status_code": 201,
-        "message": "You have been registered successfully,"
-        "Proceed to the login page...",
+        "message": "Welcome! Proceed to the login page...",
     }
     return results

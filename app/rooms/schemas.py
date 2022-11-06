@@ -9,6 +9,7 @@ from typing import (
 
 
 class RoomCreate(BaseModel):
+    join: int
     room_name: str
     description: str
 

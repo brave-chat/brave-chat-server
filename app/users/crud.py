@@ -149,3 +149,25 @@ async def update_user_password(
         }
         await session.execute(text(query), values)
     return results
+
+
+async def update_profile_picture(
+    email: str, file_name: str, session: AsyncSession
+):
+    query = """
+        UPDATE
+          users
+        SET
+          profile_picture = :file_name,
+          modified_date = :modified_date
+        WHERE
+          user_status = 1
+          AND email = :email
+    """
+    values = {
+        "file_name": file_name,
+        "email": email,
+        "modified_date": datetime.datetime.utcnow(),
+    }
+
+    return await session.execute(text(query), values)
