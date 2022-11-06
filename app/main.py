@@ -154,7 +154,7 @@ origins = [
     "http://localhost:3000",
 ]
 
-origins.extend(settings.origins)
+origins.extend(settings.cors_origins)
 
 chat_app.add_middleware(
     CORSMiddleware,

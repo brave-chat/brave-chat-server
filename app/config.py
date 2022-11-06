@@ -11,6 +11,9 @@ from pydantic import (
 from tempfile import (
     gettempdir,
 )
+from typing import (
+    List,
+)
 
 TEMP_DIR = Path(gettempdir())
 
@@ -29,6 +32,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     DETA_PROJECT_KEY: str = os.getenv("DETA_PROJECT_KEY")
     DEBUG: bool = os.getenv("DEBUG")
+    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS")
 
     # This variable is used to define
     # multiproc_dir. It's required for [uvi|guni]corn projects.
@@ -73,6 +77,14 @@ class Settings(BaseSettings):
                 + self.SINGLESTORE_DATABASE
             )
         return SQLALCHEMY_DATABASE_URL
+
+    @property
+    def cors_origins(self) -> List[str]:
+        return (
+            [url.strip() for url in self.CORS_ORIGINS.split(",") if url]
+            if self.CORS_ORIGINS
+            else []
+        )
 
     async def redis_conn(self) -> str:
         """

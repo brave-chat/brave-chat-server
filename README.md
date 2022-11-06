@@ -342,11 +342,15 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 ### Heroku
 
+This button will only deploy the server.
+
 [![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/brave-chat/brave-chat-server)
 
-#### Heroku CLI (Not Possible)
+#### Heroku CLI (Experimental: Deploy the entire stack)
 
-Before going any further, make sure you already installed and configured the Heroku CLI on you machine. If it is not the case, you can install it on Ubuntu using the followig command:
+Note that this approach is not perfect because in the docker world, you should only have one service for each container, and you should use docker compose to build and run more than two containers(e.g. one for the server, and the other one for the client). However, Heroku doesn't support docker compose with multiple services(except databases, and such.). Hence running both services in one container.
+
+To do so, make sure you already installed and configured the Heroku CLI on you machine. If it is not the case, you can install it on Ubuntu using the followig command:
 
 ```sh
 sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
@@ -364,49 +368,39 @@ Once that completed, Login to your registry:
 heroku container:login
 ```
 
-Set your env variables from the `.env` file:
+Now, create a heroku app:
 
 ```sh
-xargs -a .env -I {} heroku config:set {}
+heroku create <a unique app name>
 ```
 
-Log in to the Heroku Docker registry before.
+You can list all your apps to verify that your recent app has been created:
 
 ```sh
-heroku auth:token | docker login --username=_ registry.heroku.com --password-stdin
+heroku apps
 ```
 
-Build your container images:
+Set your env variables in the `.env` file.
+
+Build your container image:
 
 ```sh
-docker build tag lb -f Dockerfile.haproxy
-docker tag app1 registry.heroku.com/brave-chat-server_app1/web
-docker tag app2 registry.heroku.com/brave-chat-server_app2/web
-docker tag app3 registry.heroku.com/brave-chat-server_app3/web
-docker tag app4 registry.heroku.com/brave-chat-server_app4/web
+docker compose -f heroku-compose.yml build
 ```
 
-Push containers to docker hub:
+Deploy to Heroku:
 
 ```sh
-docker push registry.heroku.com/app1/web
-docker push registry.heroku.com/app2/web
-docker push registry.heroku.com/app3/web
-docker push registry.heroku.com/app4/web
-docker push registry.heroku.com/lb/web
+heroku container:push web --app <your heroku app name>; heroku logs --tail
 ```
 
-Deploy containers on Heroku:
+Once the build and push completed, you can run the following command in a separate shell to interact with the app:
 
 ```sh
-heroku container:push app1 --app ${your heroku app}
-heroku container:push app2 --app ${your heroku app}
-heroku container:push app3 --app ${your heroku app}
-heroku container:push app4 --app ${your heroku app}
-heroku container:push lb --app ${your heroku app}
+heroku open --app=<your app name>
 ```
 
-Todo: Figure out a better way to deploy multiple containers on Heroku because the above didn't work(it seems like it is not possible).
+You can refer to [heroku dev center](https://devcenter.heroku.com/articles/local-development-with-docker-compose) for more info. Happy Herokuing!
 
 ### Vercel (Not Possible)
 

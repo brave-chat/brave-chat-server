@@ -40,6 +40,7 @@ aliases:
         echo export REDIS_HOST=${REDIS_HOST} >> ./.env
         echo export REDIS_PORT=${REDIS_PORT} >> ./.env
         echo export DETA_PROJECT_KEY=${DETA_PROJECT_KEY} >> ./.env
+        echo export CORS_ORIGINS=${CORS_ORIGINS} >> ./.env
 
 jobs:
   testing:

@@ -6,6 +6,10 @@
   ],
   "description": "A fully async based backend for Brave Chat built using FastAPI, SingleStore, pydantic, SQLAlchemy, Redis, and Deta.",
   "env": {
+    "CORS_ORIGINS": {
+      "description": "Comma separated urls of the deployed client.",
+      "required": true
+    },
     "DETA_PROJECT_KEY": {
       "description": "The project key of your Deta account.",
       "required": true

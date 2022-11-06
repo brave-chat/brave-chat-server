@@ -22,22 +22,30 @@ services:
       - lb
 
   app1:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
 
   app2:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
 
   app3:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
 
   app4:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
 

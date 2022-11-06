@@ -62,6 +62,11 @@
       "description": "Your Deta project key.",
       "key": "DETA_PROJECT_KEY",
       "required": true
+    },
+    {
+      "description": "Comma separated urls of the deployed client.",
+      "key": "CORS_ORIGINS",
+      "required": true
     }
   ],
   "name": "brave-chat",

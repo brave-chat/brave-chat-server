@@ -149,7 +149,7 @@ dist: clean ## builds source and wheel package
 	poetry build
 
 build:
-	docker compose build
+	docker compose --file docker-compose.yml build
 
 up:
 	docker compose up
