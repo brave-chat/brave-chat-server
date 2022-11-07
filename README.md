@@ -1,5 +1,7 @@
 # Brave Chat Server
 
+[![Demo](https://badgen.net/badge/icon/demo?icon=telegram&label=brave-chat)](https://brave-chat-demo.herokuapp.com/)
+[![Docs](https://badgen.net/badge/icon/docs?icon=wiki&label=server-docs)](https://docs.brave-chat.wiseai.dev/backend-installation)
 ![Vercel](https://vercelbadge.vercel.app/api/brave-chat/brave-chat-server)
 ![Codeql](https://github.com/github/docs/actions/workflows/codeql.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -7,13 +9,15 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/brave-chat/brave-chat-server/main.svg)](https://results.pre-commit.ci/latest/github/brave-chat/brave-chat-server/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+
 [![Architecture](https://github.com/brave-chat/brave-chat/blob/main/docs/static/images/architecture.png)](https://github.com/brave-chat/brave-chat-server)
 
-A Fully Async based backend for [Brave Chat](https://github.com/brave-chat/brave-chat). It is a multi-model server that is fully functional and supports all the usual messaging app capabilities such as of one-on-one (private) and room messaging. It enables users to send text and multimedia messages(e.g. images). Also, users can freely create, join, and leave chat rooms where everyone can message each other.
+A Fully Async-based backend for [Brave Chat](https://github.com/brave-chat/brave-chat). It is a multi-model server that is fully functional and supports all the usual messaging app capabilities, such as one-on-one (private) and room messaging. It enables users to send text and multimedia messages(e.g. images). Also, users can freely create, join, and leave chat rooms where everyone can message each other.
 
 ## Table of Contents
 
 - [Features](#features)
+- [SingleStoreDB Integration](#singlestoredb-integration)
 - [Development Requirements](#development-requirements)
 - [Project Structure](#project-structure)
 - [Installation with Make](#installation-with-make)
@@ -47,18 +51,29 @@ A Fully Async based backend for [Brave Chat](https://github.com/brave-chat/brave
 
 This project supports the following features:
 
-- Create, join rooms.
 - Multi-model Database.
 - Highly scalable architecture.
+- Create, join, and leave rooms.
+- Full-text search on a contacts list.
 - Changing user profile information.
-- Add, remove users to/from contacts list.
-- Sending an Receiving images in real time.
-- Sending an Receiving text messages in real time.
+- Add, and remove users to/from a contacts list.
+- Sending and Receiving images in real-time.
+- Sending and Receiving text messages in real-time.
 - Unicast messaging (e.g. Sending private messages).
-- A pub/sub Redis architecture built on top of web-sockets.
+- A pub/sub Redis architecture built on top of web sockets.
 - Broadcast messaging (e.g. Sending messages in a chat room).
 - A Monolith architecture, but its modularity allows it to be divided into microservices.
-- Full control over your messages with the ability to create, delete, and edit them as you please.
+- Full control over your messages with the ability to create, delete and edit them as you please.
+
+## SingleStoreDB Integration
+
+[![Brave Chat Database](https://github.com/brave-chat/brave-chat/blob/main/docs/static/images/diagram.png)](https://docs.brave-chat.wiseai.dev/data-models-mysql)
+
+This project uses a multi-model relational database to store information about users. Each record in every data table can be considered a [time series record](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/utils/mixins.py#L50-L55), especially the `messages` table given the rate of read and write access, given a creation date and update date for each record.
+
+In addition, an [basic text search](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/rooms/crud.py#L363) is being implemented to populate the chat list view and the room list view. The contact list view supports [full-text search](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/contacts/crud.py#L224-L231) on a user's first name, last name, and email address.
+
+You can refer to the official documentation for more information about [the database](https://docs.brave-chat.wiseai.dev/data-models-mysql) and [the architecture](https://docs.brave-chat.wiseai.dev/architecture).
 
 ## Development Requirements
 
@@ -119,7 +134,7 @@ This project supports the following features:
 
 ## Installation with Make
 
-The best way to configure, install main dependencies, and run the project is by using `make`. So, make sure you have `make` installed and configured on your machine. If it is not the case, head over to [this thread](https://stackoverflow.com/questions/32127524/how-to-install-and-use-make-in-windows) on stackoverflow to install it on windows, or [this thread](https://stackoverflow.com/questions/11494522/installing-make-on-mac) to install it on Mac OS.
+The best way to configure, install main dependencies, and run the project is by using `make`. So, ensure you have `make` installed and configured on your machine. If it is not the case, head over to [this thread](https://stackoverflow.com/questions/32127524/how-to-install-and-use-make-in-windows) on StackOverflow to install it on windows, or [this thread](https://stackoverflow.com/questions/11494522/installing-make-on-mac) to install it on Mac OS.
 
 Having `make` installed and configured on your machine, you can now run `make` under the root directory of this project to explore different available commands to run:
 
@@ -214,7 +229,7 @@ DETA_PROJECT_KEY=
 
 ### 10. Generate a secret key
 
-Generate a secret key using openssl and update its env var in .env file.
+Generate a secret key using OpenSSL and update its env var in the .env file.
 
 ```sh
 openssl rand -hex 128
@@ -242,7 +257,7 @@ First thing first, to run the entire platform, you have to clone the `brave-chat
 git submodule update --init --recursive
 ```
 
-Once that done, make sure your have [compose v2](https://github.com/docker/compose) installed and configured on your machine, and run the following command to build the predefined docker services(make sure you have a .env file beforehand):
+Once that is done, make sure you have [compose v2](https://github.com/docker/compose) installed and configured on your machine, and run the following command to build the predefined docker services(make sure you have a .env file beforehand):
 
 **Using Make**
 
@@ -270,7 +285,7 @@ or running:
 docker compose up
 ```
 
-Wait untill the client service become available:
+Wait until the client service becomes available:
 
 ```sg
 brave-chat-server-client-1      | Starting the development server...
@@ -306,13 +321,13 @@ make down
 
 ## Deta Micros (Not Possible)
 
-To use the Deta version of the APIs you'll need to create a Deta account.
+You'll need to create a Deta account to use the Deta version of the APIs.
 
 [![Deploy on Deta](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/brave-chat/brave-chat-server)
 
 #### Deta CLI (Not Possible)
 
-Make sure you have Deta cli installed on your machine. If it is not the case, just run the following command(on a linux distro or Mac):
+Make sure you have Deta CLI installed on your machine. If it is not the case, just run the following command(on a Linux distro or Mac):
 
 ```sh
 curl -fsSL https://get.deta.dev/cli.sh | sh
@@ -336,7 +351,7 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 
 - _Make sure your `.env` file is being provided with valid env vars values accordingly._
 
-- _The `main.py` file is used as an entry point for deta. Same goes for `requirements.txt`._
+- _The `main.py` file is used as an entry point for Deta. The same goes for `requirements.txt`._
 
 - _Deta Micros are limited to 512MB per deployment._
 
@@ -348,9 +363,9 @@ This button will only deploy the server.
 
 #### Heroku CLI (Experimental: Deploy the entire stack)
 
-Note that this approach is not perfect because in the docker world, you should only have one service for each container, and you should use docker compose to build and run more than two containers(e.g. one for the server, and the other one for the client). However, Heroku doesn't support docker compose with multiple services(except databases, and such.). Hence running both services in one container.
+Note that this approach is not perfect because in the docker world, you should only have one service for each container, and you should use docker-compose to build and run more than two containers(e.g. one for the server and the other one for the client). However, Heroku doesn't support docker-compose with multiple services(except databases and such.). Hence running both services in one container.
 
-To do so, make sure you already installed and configured the Heroku CLI on you machine. If it is not the case, you can install it on Ubuntu using the followig command:
+To do so, ensure you have already installed and configured the Heroku CLI on your machine. If it is not the case, you can install it on Ubuntu using the following command:
 
 ```sh
 sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
@@ -362,13 +377,13 @@ Now, you need to install the Heroku container registry plugin:
 heroku plugins:install heroku-container-registry
 ```
 
-Once that completed, Login to your registry:
+Once that is completed, log in to your registry:
 
 ```sh
 heroku container:login
 ```
 
-Now, create a heroku app:
+Now, create a Heroku app:
 
 ```sh
 heroku create <a unique app name>
@@ -394,7 +409,7 @@ Deploy to Heroku:
 heroku container:push web --app <your heroku app name>; heroku logs --tail
 ```
 
-Once the build and push completed, you can run the following command in a separate shell to interact with the app:
+Once the build and push are completed, you can run the following command in a separate shell to interact with the app:
 
 ```sh
 heroku open --app=<your app name>
@@ -404,15 +419,15 @@ You can refer to [heroku dev center](https://devcenter.heroku.com/articles/local
 
 ### Vercel (Not Possible)
 
-This project makes use of WebSockets, which are unforunately not supported by Vercel's serverless functions.
+This project uses WebSockets, which are unfortunately not supported by Vercel's serverless functions.
 
 [![Deploy on Vercel](https://camo.githubusercontent.com/f209ca5cc3af7dd930b6bfc55b3d7b6a5fde1aff/68747470733a2f2f76657263656c2e636f6d2f627574746f6e)](https://vercel.com/import/project?template=https://github.com/brave-chat/brave-chat-server)
 
 ### Netlify (Not Possible)
 
-This project makes use of WebSockets, which are unforunately not supported by Netlify's serverless functions.
+Unfortunately, this project uses WebSockets, which is not supported by Netlify's serverless functions.
 
-Additionally, running a FastAPI app is not possible on Netlify because the app consists of server side rendering. Only client side rendering is currently allowed on Netlify, which means that you can only deploy statically generated websites like docs and such. I tried to hack my way around it by creating a serverless function that executes `uvicorn main:app --reload` in the background. However, the serverless function is being deployed on a different environment.
+Additionally, running a FastAPI app is not possible on Netlify because the app consists of server-side rendering. Only client-side rendering is currently allowed on Netlify, meaning you can only deploy statically generated websites like docs. I tried to hack my way around it by creating a serverless function that executes `uvicorn main:app --reload` in the background. However, the serverless function is being deployed in a different environment.
 
 [![Deploy on Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/brave-chat/brave-chat-server)
 
@@ -438,7 +453,7 @@ The following packages are the main dependencies used to build this project:
 This project is open for anyone to contribute:
 
 - Adding support for multimedia messages other than images such as PDFs, txt, and more.
-- Store messages content in the database as encrypted data rather than plain text. You can refer to the signal protocol for ideas.
+- Store message content in the database as encrypted data rather than plain text. You can refer to the signal protocol for ideas.
 - Sending voice messages.
 - Design and implement a k8s architecture and deploy it on GCP.
 
