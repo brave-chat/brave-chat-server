@@ -1,6 +1,7 @@
 # Brave Chat Server
 
-[![Demo](https://badgen.net/badge/icon/demo?icon=telegram&label=brave-chat)](https://brave-chat-demo.herokuapp.com/)
+[![Demo on Cloudflare](https://badgen.net/badge/icon/cloudflare/green?icon=telegram&label=brave-chat)](https://brave-chat-client.pages.dev/landing)
+[![Demo on Heroku](https://badgen.net/badge/icon/heroku?icon=telegram&label=brave-chat)](https://brave-chat-demo.herokuapp.com/)
 [![Docs](https://badgen.net/badge/icon/docs?icon=wiki&label=server-docs)](https://docs.brave-chat.wiseai.dev/backend-installation)
 ![Vercel](https://vercelbadge.vercel.app/api/brave-chat/brave-chat-server)
 ![Codeql](https://github.com/github/docs/actions/workflows/codeql.yml/badge.svg)
@@ -71,7 +72,7 @@ This project supports the following features:
 
 This project uses a multi-model relational database to store information about users. Each record in every data table can be considered a [time series record](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/utils/mixins.py#L50-L55), especially the `messages` table given the rate of read and write access, given a creation date and update date for each record.
 
-In addition, an [basic text search](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/rooms/crud.py#L363) is being implemented to populate the chat list view and the room list view. The contact list view supports [full-text search](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/contacts/crud.py#L224-L231) on a user's first name, last name, and email address.
+In addition, a [basic text search](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/rooms/crud.py#L363) is being implemented to populate the chat list view and the room list view. The contact list view supports [full-text search](https://github.com/brave-chat/brave-chat-server/blob/6818a2591a55de7df8cd84bd95ce22fac2f60cd0/app/contacts/crud.py#L224-L231) on a user's first name, last name, and email address.
 
 You can refer to the official documentation for more information about [the database](https://docs.brave-chat.wiseai.dev/data-models-mysql) and [the architecture](https://docs.brave-chat.wiseai.dev/architecture).
 
