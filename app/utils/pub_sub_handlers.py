@@ -118,9 +118,23 @@ async def consumer_handler(
                         message_data["media"] = url
                         message_data["content"] = ""
                         message_data.pop("preview")
-                        await connection.publish(
-                            topic, json.dumps(message_data, default=str)
+                    else:
+                        request = RequestRoomObject(
+                            topic,
+                            "",
+                            message_data["type"],
+                            message_data,
                         )
+                        url = await send_new_room_message(
+                            sender_id, request, bin_photo, session
+                        )
+                        message_data["media"] = url
+                        message_data["content"] = ""
+                        message_data.pop("preview")
+                    await connection.publish(
+                        topic, json.dumps(message_data, default=str)
+                    )
+                    del request
                 else:
                     logger.info(
                         f"CONSUMER RECIEVED: {json.dumps(message_data, default=str)}"  # noqa: E501
@@ -151,7 +165,9 @@ async def consumer_handler(
                             "",
                         )
                         ensure_future(
-                            send_new_room_message(sender_id, request, session)
+                            send_new_room_message(
+                                sender_id, request, None, session
+                            )
                         )
                     del request
             else:

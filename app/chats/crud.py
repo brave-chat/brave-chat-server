@@ -18,6 +18,9 @@ from app.chats.schemas import (
 from app.config import (
     settings,
 )
+from app.rooms import (
+    crud as rooms_crud,
+)
 from app.users.schemas import (
     UserObjectSchema,
 )
@@ -94,6 +97,46 @@ async def send_new_message(
             values = {
                 "sender": sender_id,
                 "receiver": receiver.id,
+                "content": request.content,
+                "message_type": request.message_type,
+                "media": file_name,
+                "creation_date": datetime.datetime.utcnow(),
+            }
+        else:
+            if not request.media["preview"]:
+                return {
+                    "status_code": 400,
+                    "message": "You can't upload an empty file!",
+                }
+            room = await rooms_crud.find_existed_room(
+                room_name=request.room, session=session
+            )
+            file_name = f"/chat/images/room/{str(sender_id)}/image_{str(uuid.uuid4())}.png"
+            images.put(file_name, file)
+            # create a new message
+            query = """
+                INSERT INTO messages (
+                  sender,
+                  room,
+                  content,
+                  message_type,
+                  media,
+                  status,
+                  creation_date
+                )
+                VALUES (
+                  :sender,
+                  :room,
+                  :content,
+                  :message_type,
+                  :media,
+                  1,
+                  :creation_date
+                )
+            """
+            values = {
+                "sender": sender_id,
+                "room": room.id,
                 "content": request.content,
                 "message_type": request.message_type,
                 "media": file_name,

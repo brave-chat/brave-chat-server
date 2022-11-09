@@ -181,7 +181,9 @@ async def get_user_contacts(user_id: int, session: AsyncSession):
         contacts = result.fetchall()
         results = {"status_code": 200, "result": contacts}
         return results
-    return {"status_code": 400, "message": "User not found!"}
+    elif not user:
+        return {"status_code": 400, "message": "User not found!"}
+    return {"status_code": 200, "result": []}
 
 
 async def search_user_contacts(
@@ -235,5 +237,6 @@ async def search_user_contacts(
         return_results = result.fetchall()
         results = {"status_code": 200, "result": return_results}
         return results
-
-    return {"status_code": 400, "message": "User not found!"}
+    elif not user:
+        return {"status_code": 400, "message": "User not found!"}
+    return {"status_code": 200, "result": []}

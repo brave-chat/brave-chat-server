@@ -7,9 +7,8 @@ from sqlalchemy.sql import (
     text,
 )
 
-from app.chats.crud import (
-    delete_room_messages,
-    send_new_message,
+from app.chats import (
+    crud as chats_crud,
 )
 from app.chats.schemas import (
     MessageCreateRoom,
@@ -115,6 +114,7 @@ async def delete_room_user(user_id: int, room_id: int, session: AsyncSession):
 async def create_assign_new_room(
     user_id: int, room_obj, session: AsyncSession
 ):
+    room_obj.room_name = room_obj.room_name.lower()
     if not room_obj.room_name:
         results = {
             "status_code": 400,
@@ -123,7 +123,7 @@ async def create_assign_new_room(
         return results
     room = await find_existed_room(room_obj.room_name, session)
     if not room:
-        if not room_obj.join:
+        if room_obj.join == 1:
             await create_room(
                 room_obj.room_name, room_obj.description, session
             )
@@ -230,10 +230,13 @@ async def get_room_conversations(
 
 
 async def send_new_room_message(
-    sender_id: int, request: MessageCreateRoom, session: AsyncSession
+    sender_id: int,
+    request: MessageCreateRoom,
+    bin_photo: str,
+    session: AsyncSession,
 ):
     # Check for empty message
-    if not request.content:
+    if not request.content and not bin_photo:
         return {
             "status_code": 400,
             "message": "You can't send an empty message!",
@@ -254,9 +257,14 @@ async def send_new_room_message(
         }
     else:
         # create a new message
-        results = await send_new_message(
-            sender_id, request, None, room.id, session
-        )
+        if request.media:
+            results = await chats_crud.send_new_message(
+                sender_id, request, bin_photo, room.id, session
+            )
+        else:
+            results = await chats_crud.send_new_message(
+                sender_id, request, None, room.id, session
+            )
     return results
 
 
@@ -313,7 +321,9 @@ async def delete_room_user_chat(
     else:
         user = await find_existed_user_in_room(user_id, room.id, session)
         if user:
-            results = await delete_room_messages(user_id, room.id, session)
+            results = await chats_crud.delete_room_messages(
+                user_id, room.id, session
+            )
             logger.info(
                 f"`{user_id}` has deleted their messages in this room!"
             )

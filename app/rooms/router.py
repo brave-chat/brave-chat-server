@@ -1,6 +1,8 @@
+from deta import Deta
 from fastapi import (
     APIRouter,
     Depends,
+    responses,
 )
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -11,6 +13,9 @@ from app.auth.schemas import (
 )
 from app.chats.schemas import (
     MessageCreateRoom,
+)
+from app.config import (
+    settings,
 )
 from app.rooms.crud import (
     create_assign_new_room,
@@ -36,6 +41,10 @@ from app.utils.dependencies import (
 from app.utils.jwt_util import (
     get_current_active_user,
 )
+
+deta = Deta(settings.DETA_PROJECT_KEY)
+
+sent_images = deta.Drive("sent-images")
 
 router = APIRouter(prefix="/api/v1")
 
@@ -92,7 +101,9 @@ async def send_room_message(
     """
     Send a new message.
     """
-    results = await send_new_room_message(currentUser.id, request, session)
+    results = await send_new_room_message(
+        currentUser.id, request, None, session
+    )
     return results
 
 
@@ -179,3 +190,14 @@ async def get_rooms_for_user(
     """
     results = await get_rooms_user(currentUser.id, session)
     return results
+
+
+@router.get("/chat/images/room/{room_id}/{uuid_val}")
+async def get_sent_room_chat_images(room_id: int, uuid_val: str):
+    try:
+        img = sent_images.get(f"/chat/images/user/{room_id}/{uuid_val}")
+        return responses.StreamingResponse(
+            img.iter_chunks(), media_type="image/png"
+        )
+    except Exception as e:
+        return {"status_code": 400, "message": str(e)}
