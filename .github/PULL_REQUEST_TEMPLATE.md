@@ -1,0 +1,1 @@
+- [ ] I have followed (at least) the [PR section of the contributing guide](https://github.com/brave-chat/brave-chat-server/blob/main/CONTRIBUTING.md#-pull-request-guidelines).
