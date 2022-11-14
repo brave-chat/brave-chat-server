@@ -1,8 +1,15 @@
+"""Chats router module."""
+
+# conflict between isort and py
+# pylint: disable=C0411
 from deta import Deta
 from fastapi import (
     APIRouter,
     Depends,
     responses,
+)
+from pydantic import (
+    EmailStr,
 )
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -63,11 +70,21 @@ router = APIRouter(prefix="/api/v1")
 )
 async def send_message(
     request: MessageCreate,
-    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    currentUser: UserObjectSchema = Depends(
+        get_current_active_user
+    ),  # pylint: disable=C0103
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
-    Deliver a new message given an authenticated user.
+    The send_message endpoint.
+
+    Args:
+        request (MessageCreate) : A `MessageCreate` schema that contains info about the recipient.
+        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
+        session (AsyncSession) : An autocommit sqlalchemy session object.
+
+    Returns:
+        ResponseSchema: return a response schema object.
     """
     results = await send_new_message(
         currentUser.id, request, None, None, session
@@ -88,12 +105,22 @@ async def send_message(
     },
 )
 async def get_conversation(
-    receiver: str,
-    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    receiver: EmailStr,
+    currentUser: UserObjectSchema = Depends(
+        get_current_active_user
+    ),  # pylint: disable=C0103
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
-    Return all messages grouped by senders for a given receiver.
+    The get_conversation endpoint.
+
+    Args:
+        receiver (EmailStr) : The recipient email.
+        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
+        session (AsyncSession) : An autocommit sqlalchemy session object.
+
+    Returns:
+        ResponseSchema | GetAllMessageResults: return a list of messages between sender and receiver
     """
     results = await get_sender_receiver_messages(
         currentUser, receiver, session
@@ -108,11 +135,21 @@ async def get_conversation(
 )
 async def get_chats_user_list(
     search: str,
-    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    currentUser: UserObjectSchema = Depends(
+        get_current_active_user
+    ),  # pylint: disable=C0103
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
-    Get all chats for an authenticated user.
+    The get_chats_user_list endpoint.
+
+    Args:
+        search (str) : first name to perform a basic search.
+        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
+        session (AsyncSession) : An autocommit sqlalchemy session object.
+
+    Returns:
+        ResponseSchema | GetAllMessageResults: return a list of messages between sender and receiver
     """
     results = await get_chats_user(currentUser.id, search, session)
     return results
@@ -125,11 +162,21 @@ async def get_chats_user_list(
 )
 async def get_chats_user_search_list(
     search: str,
-    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    currentUser: UserObjectSchema = Depends(
+        get_current_active_user
+    ),  # pylint: disable=C0103
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
-    Get all chats for an authenticated user.
+    The get_chats_user_search_list endpoint.
+
+    Args:
+        search (str) : first name to perform a basic search.
+        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
+        session (AsyncSession) : An autocommit sqlalchemy session object.
+
+    Returns:
+        list: return a list of users that has messages between sender and receiver.
     """
     results = await get_chats_user(currentUser.id, search, session)
     return results
@@ -154,11 +201,21 @@ async def get_chats_user_search_list(
 )
 async def delete_user_chat(
     contact: DeleteChatMessages,
-    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    currentUser: UserObjectSchema = Depends(
+        get_current_active_user
+    ),  # pylint: disable=C0103
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
     """
-    delete a room chat.
+    The delete_user_chat endpoint.
+
+    Args:
+        contact (DeleteChatMessages) : A schema object for the contact.
+        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
+        session (AsyncSession) : An autocommit sqlalchemy session object.
+
+    Returns:
+        ResponseSchema: return a response that indicates whether or not the delete was successful.
     """
     results = await delete_chat_messages(
         currentUser.id, contact.contact, session
@@ -168,10 +225,20 @@ async def delete_user_chat(
 
 @router.get("/chat/images/user/{user_id}/{uuid_val}")
 async def get_sent_user_chat_images(user_id: int, uuid_val: str):
+    """
+    The get_sent_user_chat_images endpoint.
+
+    Args:
+        user_id (id) : The id of the sender of the image.
+        uuid_val (str): A unique uuid generated upon upload.
+
+    Returns:
+        responses: return a response object for a given url(image).
+    """
     try:
         img = sent_images.get(f"/chat/images/user/{user_id}/{uuid_val}")
         return responses.StreamingResponse(
             img.iter_chunks(), media_type="image/png"
         )
-    except Exception as e:
-        return {"status_code": 400, "message": str(e)}
+    except Exception:  # pylint: disable=W0703
+        return {"status_code": 400, "message": "Something went wrong!"}
