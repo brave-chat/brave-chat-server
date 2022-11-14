@@ -1,3 +1,7 @@
+"""The auth router module."""
+
+# conflict between isort and py
+# pylint: disable=C0411
 from fastapi import (
     APIRouter,
     Depends,
@@ -5,6 +9,8 @@ from fastapi import (
 from fastapi.security import (
     OAuth2PasswordRequestForm,
 )
+
+# pylint: disable=E0401
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
@@ -57,6 +63,16 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
+    """
+    The login endpoint.
+
+    Args:
+        form_data (OAuth2PasswordRequestForm) : OAuth2 request form.
+        session (AsyncSession) : An autocommit sqlalchemy session object.
+
+    Returns:
+        Token | ResponseSchema: return access token dict, or response schema object.
+    """
     access_token = await login_user(form_data, session)
     return access_token
 
@@ -82,5 +98,15 @@ async def register(
     user: UserCreate,
     session: AsyncSession = Depends(get_db_transactional_session),
 ):
+    """
+    The register endpoint.
+
+    Args:
+        user (UserCreate) : A UserCreate schema object.
+        session (AsyncSession) : A transactional sqlalchemy session object.
+
+    Returns:
+        UserCreate | ResponseSchema: return UserCreate or ResponseSchema object.
+    """
     results = await register_user(user, session)
     return results

@@ -1,12 +1,29 @@
+"""Auth Crud module."""
+
+# conflict between isort and pylint
+# pylint: disable=C0411,E0401
 import datetime
 from fastapi.encoders import (
     jsonable_encoder,
+)
+from fastapi.security import (
+    OAuth2PasswordRequestForm,
+)
+from pydantic import (
+    EmailStr,
+)
+from sqlalchemy.engine import (
+    Result,
 )
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 from sqlalchemy.sql import (
     text,
+)
+from typing import (
+    Any,
+    Dict,
 )
 
 from app.auth.schemas import (
@@ -29,7 +46,17 @@ from app.utils.jwt_util import (
 )
 
 
-async def create_user(user: UserCreate, session: AsyncSession):
+async def create_user(user: UserCreate, session: AsyncSession) -> Result:
+    """
+    A method to insert a user into the users table.
+
+    Args:
+        user (UserCreate) : A user schema object that contains all info about a user.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
     query = """
         INSERT INTO users (
           first_name,
@@ -58,7 +85,19 @@ async def create_user(user: UserCreate, session: AsyncSession):
     return await session.execute(text(query), values)
 
 
-async def find_existed_user(email: str, session: AsyncSession):
+async def find_existed_user(
+    email: EmailStr, session: AsyncSession
+) -> Dict[str, Any]:
+    """
+    A method to fetch a user info given an email.
+
+    Args:
+        email (EmailStr) : A given user email.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Dict[str, Any]: a dict object that contains info about a user.
+    """
     query = "SELECT * FROM users WHERE email=:email AND user_status=1"
     values = {"email": email}
     result = await session.execute(text(query), values)
@@ -66,9 +105,21 @@ async def find_existed_user(email: str, session: AsyncSession):
     return user
 
 
-async def find_existed_user_id(id: int, session: AsyncSession):
+async def find_existed_user_id(
+    id_: int, session: AsyncSession
+) -> Dict[str, Any]:
+    """
+    A method to fetch a user info given an id.
+
+    Args:
+        id_ (int) : A given user email.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Dict[str, Any]: a dict object that contains info about a user.
+    """
     query = "SELECT * FROM users WHERE id=:id AND user_status=1"
-    values = {"id": id}
+    values = {"id": id_}
     result = await session.execute(text(query), values)
     user = result.fetchone()
     if user:
@@ -76,7 +127,19 @@ async def find_existed_user_id(id: int, session: AsyncSession):
     return user
 
 
-async def get_users_with_black_listed_token(token: str, session: AsyncSession):
+async def get_users_with_black_listed_token(
+    token: str, session: AsyncSession
+) -> Dict[str, Any]:
+    """
+    A method to fetch all disabled user access tokens.
+
+    Args:
+        token (str) : A given token value.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Dict[str, Any]: a dict object that contains info about a token.
+    """
     query = """
         SELECT
           *
@@ -93,7 +156,19 @@ async def get_users_with_black_listed_token(token: str, session: AsyncSession):
     return token
 
 
-async def login_user(form_data, session: AsyncSession):
+async def login_user(
+    form_data: OAuth2PasswordRequestForm, session: AsyncSession
+) -> Dict[str, Any]:
+    """
+    A method to fetch and return serialized user info upon logging in.
+
+    Args:
+        form_data (OAuth2PasswordRequestForm) : OAuth2 request form.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Dict[str, Any]: a dict object that contains info about a given user.
+    """
     user_obj = await find_existed_user(form_data.username, session)
     if not user_obj:
         return {"status_code": 400, "message": "User not found!"}
@@ -134,7 +209,19 @@ async def login_user(form_data, session: AsyncSession):
     return access_token
 
 
-async def register_user(user, session: AsyncSession):
+async def register_user(
+    user: UserCreate, session: AsyncSession
+) -> Dict[str, Any]:
+    """
+    A method to fetch and return serialized user info upon registering a new account.
+
+    Args:
+        user (UserCreate) : A UserCreate schema object.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Dict[str, Any]: a dict object that contains info about a given user.
+    """
     fetched_user = await find_existed_user(user.email, session)
     if fetched_user:
         return {"status_code": 400, "message": "User already signed up!"}

@@ -1,4 +1,10 @@
+"""Auth models module."""
+
+# conflict between isort and pylint
+# pylint: disable=C0411
 from enum import Enum
+
+# pylint: disable=E0401
 from sqlalchemy import (
     Column,
     ForeignKey,
@@ -6,7 +12,10 @@ from sqlalchemy import (
     String,
 )
 from typing import (
+    Dict,
+    List,
     Optional,
+    Union,
 )
 
 from app.utils.mixins import (
@@ -17,12 +26,30 @@ from app.utils.mixins import (
 
 
 class TokenStatus(int, Enum):
-    active = 1
-    disabled = 0
+    """
+    Enum class to define token status.
+
+    Args:
+        ACTIVE (int) : An integer to indicate that the token is active.
+        DISABLED (int) : An integer to indicate that the token has been disabled.
+    """
+
+    ACTIVE = 1
+    DISABLED = 0
 
 
-class AccessTokens(Base, CommonMixin, TimestampMixin):
-    __table_args__ = {
+class AccessTokens(Base, CommonMixin, TimestampMixin):  # pylint: disable=R0903
+    """
+    The `access_tokens` model.
+
+    Args:
+        __table_args__ (dict) : SqlAlchemy configs to convert from COLUMNAR to ROWSTORE.
+        user (int) : A user id foreign key value.
+        token (str) : A token value.
+        token_status (TokenStatus) : A token status.
+    """
+
+    __table_args__: Dict[str, Union[str, List[str]]] = {
         "mysql_engine": "InnoDB",
         "prefixes": ["ROWSTORE", "REFERENCE"],
     }

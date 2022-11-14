@@ -50,3 +50,9 @@ repos:
           - "--remove-all-unused-imports"
           - "--remove-unused-variables"
           - "--ignore-init-module-imports"
+
+# to be added once all errors are resolved.
+# -   repo: https://github.com/PyCQA/pylint
+#     rev: pylint-3.0.0-a5
+#     hooks:
+#     - id: pylint
