@@ -1,11 +1,21 @@
+"""Chats Crud module."""
+
+# conflict between isort and pylint
+# pylint: disable=C0411,E0401
 import datetime
 from deta import Deta
 import logging
+from pydantic import (
+    EmailStr,
+)
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 from sqlalchemy.sql import (
     text,
+)
+from typing import (
+    Any,
 )
 import uuid
 
@@ -36,6 +46,16 @@ async def find_existed_user_messages(
     user_id: int,
     session: AsyncSession,
 ):
+    """
+    A method to fetch messages for a given user id.
+
+    Args:
+        user_id (int) : A user id.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
     query = """
         SELECT
           *
@@ -54,14 +74,27 @@ async def find_existed_user_messages(
     return messages
 
 
-async def send_new_message(
+async def send_new_message(  # pylint: disable=R0911
     sender_id: int,
     request: MessageCreate,
-    file,
+    file: Any,
     room_id: int,
     session: AsyncSession,
 ):
-    if request.message_type == "media":
+    """
+    A method to insert a new message into the messages table.
+
+    Args:
+        sender_id (int) : A user id that represents the sender of the message.
+        request (MessageCreate) : A schema for the message.
+        file (Any) : An image to upload to Deta drive.
+        room_id (int) : the id of the room.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
+    if request.message_type == "media":  # pylint: disable=R1705
         if not room_id:
             if not request.media["preview"]:
                 return {
@@ -235,6 +268,17 @@ async def delete_room_messages(
     room_id: int,
     session: AsyncSession,
 ):
+    """
+    A method to delete messages from a room.
+
+    Args:
+        sender_id (int) : A user id that represents the sender of the message.
+        room_id (int) : the id of the room.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
 
     query = """
         SELECT
@@ -249,7 +293,7 @@ async def delete_room_messages(
     values = {"sender_id": sender_id, "room_id": room_id}
     result = await session.execute(text(query), values)
     messages = result.fetchall()
-    if not messages:
+    if not messages:  # pylint: disable=R1705
         return {
             "status_code": 400,
             "message": "There are no messages to delete!",
@@ -284,9 +328,20 @@ async def delete_room_messages(
 
 async def delete_chat_messages(
     sender_id: int,
-    receiver: str,
+    receiver: EmailStr,
     session: AsyncSession,
 ):
+    """
+    A method to delete messages from a room.
+
+    Args:
+        sender_id (int) : A user id that represents the sender of the message.
+        receiver (EmailStr) : An email for the recipient of the message.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
     receiver = await find_existed_user(email=receiver, session=session)
     if not receiver:
         return {
@@ -306,7 +361,7 @@ async def delete_chat_messages(
     values = {"sender_id": sender_id, "receiver_id": receiver.id}
     result = await session.execute(text(query), values)
     messages = result.fetchall()
-    if not messages:
+    if not messages:  # pylint: disable=R1705
         return {
             "status_code": 400,
             "message": "There are no messages to delete!",
@@ -340,8 +395,19 @@ async def delete_chat_messages(
 
 
 async def get_sender_receiver_messages(
-    sender: UserObjectSchema, receiver: str, session: AsyncSession
+    sender: UserObjectSchema, receiver: EmailStr, session: AsyncSession
 ):
+    """
+    A method to fetch messages between a sender and a receiver.
+
+    Args:
+        sender (UserObjectSchema) : A user object schema that contains infor about a sender.
+        receiver (EmailStr) : An email for the recipient of the message.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
     receiver = await find_existed_user(email=receiver, session=session)
     if not receiver:
         return {
@@ -402,10 +468,20 @@ async def get_sender_receiver_messages(
     return results
 
 
-async def get_chats_user(user_id: int, search, session: AsyncSession):
+async def get_chats_user(user_id: int, search: str, session: AsyncSession):
+    """
+    A method to fetch messages between a sender and a receiver.
+
+    Args:
+        user_id (int) : A user id for the sender of the message.
+        search (str) : A string that represents the first name of the recipient.
+        session (AsyncSession) : SqlAlchemy session object.
+
+    Returns:
+        Result: Database result.
+    """
     messages = await find_existed_user_messages(user_id, session)
     if messages:
-        # get all contacts for each user.
         if search:
             query = """
                 SELECT
