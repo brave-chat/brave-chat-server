@@ -33,7 +33,7 @@ uvicorn = {extras = ["standard"], version = "^0.18.3"}
 python-multipart = "^0.0.5"
 deta = "^1.1.0"
 pydantic = {extras = ["email"], version = "^1.9.2"}
-SQLAlchemy = "==1.4.41"
+SQLAlchemy = "==1.4.44"
 aiomysql = "^0.1.1"
 aioredis = "^2.0.1"
 prometheus-fastapi-instrumentator = "^5.9.1"
