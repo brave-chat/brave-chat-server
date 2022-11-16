@@ -138,14 +138,24 @@ def set_multiproc_dir() -> None:
 
 logger = logging.getLogger(__name__)
 
-chat_app = FastAPI(
-    docs_url="/docs",
-    redoc_url="/redocs",
-    title="Brave Chat Server",
-    description="The server side of Brave Chat.",
-    version="1.0",
-    openapi_url="/api/v1/openapi.json",
-)
+if settings.DEBUG == "info":
+    chat_app = FastAPI(
+        docs_url="/docs",
+        redoc_url="/redocs",
+        title="Brave Chat Server",
+        description="The server side of Brave Chat.",
+        version="1.0",
+        openapi_url="/api/v1/openapi.json",
+    )
+else:
+    chat_app = FastAPI(
+        docs_url=None,
+        redoc_url=None,
+        title=None,
+        description=None,
+        version=None,
+        openapi_url=None,
+    )
 
 origins = [
     "http://127.0.0.1:8000",

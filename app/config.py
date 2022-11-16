@@ -41,7 +41,7 @@ class Settings(BaseSettings):
         SINGLESTORE_DATABASE (str) : SingleStore or a local MYSQL database name.
         JWT_SECRET_KEY (str) : A secure app jwt secret key.
         DETA_PROJECT_KEY (str) : A Deta project key.
-        DEBUG (bool) : A variable used to separate testing env from production env.
+        DEBUG (str) : A variable used to separate testing env from production env.
         CORS_ORIGINS (str) : A string that contains comma separated urls for cors origins.
         PROMETHEUS_DIR (str) : A temporary posix path for prometheus metrics.
 
@@ -57,7 +57,7 @@ class Settings(BaseSettings):
         >>> SINGLESTORE_DATABASE=chat
         >>> JWT_SECRET_KEY=123SDA23sa
         >>> DETA_PROJECT_KEY=12312dSDJHJSBA
-        >>> DEBUG=bool("") # False, anything else True
+        >>> DEBUG="" # "" means production, "test" means testing, "info" means development.
         >>> CORS_ORIGINS="https://app-name.herokuapp.com,http://app-name.pages.dev"
         >>> PROMETHEUS_DIR="/tmp/prom"
     """
@@ -73,7 +73,7 @@ class Settings(BaseSettings):
     SINGLESTORE_DATABASE: str = os.getenv("SINGLESTORE_DATABASE")
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     DETA_PROJECT_KEY: str = os.getenv("DETA_PROJECT_KEY")
-    DEBUG: str = bool(os.getenv("DEBUG"))
+    DEBUG: str = os.getenv("DEBUG")
     CORS_ORIGINS: str = os.getenv("CORS_ORIGINS")
     PROMETHEUS_DIR: Path = TEMP_DIR / "prom"
 
@@ -97,7 +97,7 @@ class Settings(BaseSettings):
             str: The assembled database URL.
         """
 
-        if bool(self.DEBUG):
+        if self.DEBUG == "test":
             sqlalchemy_database_url = (
                 "mysql+aiomysql://"
                 + self.SINGLESTORE_USERNAME

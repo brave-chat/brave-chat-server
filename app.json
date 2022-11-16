@@ -10,6 +10,11 @@
       "description": "Comma separated urls of the deployed client.",
       "required": true
     },
+    "DEBUG": {
+      "description": "This environment variable defines the debug level.`` means production. `info` to access the docs.",
+      "required": false,
+      "value": ""
+    },
     "DETA_PROJECT_KEY": {
       "description": "The project key of your Deta account.",
       "required": true
@@ -28,9 +33,9 @@
       "required": true
     },
     "REDIS_PORT": {
-      "description": "Your Redis node exposed port number. `15065` is the default.",
-      "required": false,
-      "value": "15065"
+      "description": "Your Redis node exposed port number.",
+      "required": true,
+      "value": ""
     },
     "REDIS_USERNAME": {
       "description": "Your Redis account username. `default` is the default username.",

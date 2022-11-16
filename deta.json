@@ -53,10 +53,10 @@
       "required": true
     },
     {
-      "description": "Your Redis node exposed port number. `15065` is the default.",
+      "description": "Your Redis node exposed port number.",
       "key": "REDIS_PORT",
-      "required": false,
-      "value": "15065"
+      "required": true,
+      "value": ""
     },
     {
       "description": "Your Deta project key.",
@@ -67,6 +67,12 @@
       "description": "Comma separated urls of the deployed client.",
       "key": "CORS_ORIGINS",
       "required": true
+    },
+    {
+      "description": "This environment variable defines the debug level. `` means production. `info` to access the docs.",
+      "key": "DEBUG",
+      "required": false,
+      "value": ""
     }
   ],
   "name": "brave-chat",

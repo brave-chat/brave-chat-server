@@ -29,7 +29,7 @@ A Fully Async-based backend for [Brave Chat](https://github.com/brave-chat/brave
   - [5. Set your SingleStore Credentials](#5-set-your-singlestore-credentials)
   - [6. Setup a Redis account](#6-setup-a-redis-account)
   - [7. Set your Redis Cloud Credentials](#7-set-your-redis-cloud-credentials)
-  - [8. Generate a secret key](#8-generate-a-secret-key)
+  - [8. Create a Deta account](#8-create-a-deta-account)
   - [9. Set your Deta project key](#9-set-your-deta-project-key)
   - [10. Generate a secret key](#10-generate-a-secret-key)
   - [11. Run The Project Locally](#11-run-the-project-locally)
@@ -215,7 +215,7 @@ REDIS_HOST=<redis url>
 REDIS_PORT=15065
 ```
 
-### 8. Generate a secret key
+### 8. Create a Deta account
 
 Create a free account on [Deta](https://www.deta.sh/), and create a new project.
 
@@ -241,7 +241,6 @@ afa1639545d53ecf83c9f8acf4704abe1382f9a9dbf76d2fd229d4795a4748712dbfe7cf1f0a812f
 ```yaml
 # App config:
 JWT_SECRET_KEY=afa1639545d53ecf83c9f8acf4704abe1382f9a9dbf76d2fd229d4795a4748712dbfe7cf1f0a812f1c0fad2d47c8343cd1017b22fc3bf43d052307137f6ba68cd2cb69748b561df846873a6257e3569d6307a7e022b82b79cb3d6e0fee00553d80913c1dcf946e2e91e1dfcbba1ed9f34c9250597c1f70f572744e91c68cbe76
-DEBUG=False
 ```
 
 ### 11. Run The Project Locally
@@ -249,6 +248,8 @@ DEBUG=False
 ```sh
 make run
 ```
+
+**Note**: _You have to set **DEBUG=info** to access the docs._
 
 ## Running locally with Compose v2
 

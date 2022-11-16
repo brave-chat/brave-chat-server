@@ -78,7 +78,7 @@ async def _engine() -> AsyncGenerator[AsyncEngine, None]:
     def get_password_hash(password):
         return pwd_context.hash(password)
 
-    settings.DEBUG = True
+    settings.DEBUG = "test"
     engine = create_async_engine(
         settings.db_url[:-5],
         pool_pre_ping=True,
