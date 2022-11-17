@@ -70,6 +70,16 @@ async def init_engine_app(app: FastAPI) -> None:  # pragma: no cover
         await conn.execute(
             text("ALTER TABLE messages MODIFY content TEXT CHARSET utf8mb4;")
         )
+        # add columns in production
+        try:
+            await conn.execute(
+                text("ALTER TABLE room_members ADD COLUMN banned INTEGER;")
+            )
+            await conn.execute(
+                text("ALTER TABLE room_members ADD COLUMN admin INTEGER;")
+            )
+        except Exception:
+            ...
 
     # Refer to https://github.com/sqlalchemy/sqlalchemy/discussions/8713 for more info.  # noqa: E501
     autocommit_engine = engine.execution_options(isolation_level="AUTOCOMMIT")

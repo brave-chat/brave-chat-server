@@ -18,6 +18,7 @@ from app.config import (
     settings,
 )
 from app.rooms.crud import (
+    ban_user_from_room,
     create_assign_new_room,
     delete_room_user_chat,
     get_room_conversations,
@@ -27,6 +28,7 @@ from app.rooms.crud import (
     send_new_room_message,
 )
 from app.rooms.schemas import (
+    BanUserRoom,
     DeleteRoomConversation,
     LeaveRoom,
     RoomCreate,
@@ -201,3 +203,34 @@ async def get_sent_room_chat_images(room_id: int, uuid_val: str):
         )
     except Exception as e:
         return {"status_code": 400, "message": str(e)}
+
+
+@router.delete(
+    "/room/user/delete",
+    status_code=200,
+    name="room:ban-user-room",
+    responses={
+        200: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates a user has"
+            " been banned from this room.",
+        },
+        400: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates if a user"
+            " doesn't exist or not a member of this room.",
+        },
+    },
+)
+async def ban_a_user_from_a_room(
+    room: BanUserRoom,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    """
+    Ban a user from a given room.
+    """
+    results = await ban_user_from_room(
+        currentUser.id, room.email, room.room_name, session
+    )
+    return results
