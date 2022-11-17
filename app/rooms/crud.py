@@ -1,5 +1,8 @@
 import datetime
 import logging
+from pydantic import (
+    EmailStr,
+)
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
@@ -7,6 +10,9 @@ from sqlalchemy.sql import (
     text,
 )
 
+from app.auth.crud import (
+    find_existed_user,
+)
 from app.chats import (
     crud as chats_crud,
 )
@@ -51,6 +57,27 @@ async def find_existed_user_in_room(
     return result.fetchone()
 
 
+async def find_admin_in_room(
+    user_id: int, room_id: int, session: AsyncSession
+):
+    query = """
+        SELECT
+          *
+        FROM
+          room_members
+        WHERE
+          room = :room_id
+        AND
+          member = :user_id
+        AND
+          admin = 1
+    """
+    values = {"room_id": room_id, "user_id": user_id}
+
+    result = await session.execute(text(query), values)
+    return result.fetchone()
+
+
 async def create_room(room_name: int, description: str, session: AsyncSession):
     query = """
         INSERT INTO rooms (
@@ -70,23 +97,46 @@ async def create_room(room_name: int, description: str, session: AsyncSession):
         "creation_date": datetime.datetime.utcnow(),
     }
 
-    result = await session.execute(text(query), values)
-    return result.fetchone()
+    return await session.execute(text(query), values)
 
 
-async def join_room(user_id: int, room_id: int, session: AsyncSession):
-    query = """
-        INSERT INTO room_members (
-          room,
-          member,
-          creation_date
-        )
-        VALUES (
-          :room,
-          :member,
-          :creation_date
-        )
-    """
+async def join_room(
+    user_id: int, room_id: int, session: AsyncSession, is_admin=False
+):
+    if is_admin:
+        query = """
+            INSERT INTO room_members (
+              room,
+              member,
+              banned,
+              admin,
+              creation_date
+            )
+            VALUES (
+              :room,
+              :member,
+              0,
+              1,
+              :creation_date
+            )
+        """
+    else:
+        query = """
+            INSERT INTO room_members (
+              room,
+              member,
+              banned,
+              admin,
+              creation_date
+            )
+            VALUES (
+              :room,
+              :member,
+              0,
+              0,
+              :creation_date
+            )
+        """
     values = {
         "room": room_id,
         "member": user_id,
@@ -123,7 +173,7 @@ async def create_assign_new_room(
         return results
     room = await find_existed_room(room_obj.room_name, session)
     if not room:
-        if room_obj.join == 1:
+        if room_obj.join == 0:
             await create_room(
                 room_obj.room_name, room_obj.description, session
             )
@@ -143,7 +193,7 @@ async def create_assign_new_room(
                 f"{room_obj.room_name}!",
             }
         else:
-            await join_room(user_id, room.id)
+            await join_room(user_id, room.id, session, True)
             logger.info(
                 f"Adding {user_id} to room `{room_obj.room_name}` as a member."
             )
@@ -155,14 +205,14 @@ async def create_assign_new_room(
 
     else:
         user = await find_existed_user_in_room(user_id, room.id, session)
-        if user and room_obj.join:
+        if user and room_obj.join == 1:
             logger.info(f"`{user_id}` has already joined this room!")
             results = {
                 "status_code": 400,
                 "message": "You have already joined room "
                 f"{room_obj.room_name}!",
             }
-        elif not user and not room_obj.join:
+        elif not user and room_obj.join == 1:
             await join_room(user_id, room.id, session)
             logger.info(
                 f"Adding {user_id} to room `{room_obj.room_name}` as a member."
@@ -401,3 +451,56 @@ async def get_rooms_user(user_id: int, session: AsyncSession):
     contacts = result.fetchall()
     results = {"status_code": 200, "result": contacts}
     return results
+
+
+async def ban_user_from_room(
+    admin_id: int, user_email: EmailStr, room_name: str, session: AsyncSession
+):
+    room_name = room_name.lower()
+    if not room_name:
+        return {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+    room_obj = await find_existed_room(room_name, session)
+    if not room_obj:
+        return {
+            "status_code": 400,
+            "message": "Room doesn't exist!",
+        }
+    admin = await find_admin_in_room(admin_id, room_obj.id, session)
+    if not admin:
+        return {
+            "status_code": 400,
+            "message": "You are not the admin of this room!",
+        }
+    else:
+        user_profile = await find_existed_user(user_email, session)
+        if not user_profile:
+            return {
+                "status_code": 400,
+                "message": "User not found!",
+            }
+        room = await find_existed_user_in_room(
+            user_profile.id, room_obj.id, session
+        )
+        if not room:
+            results = {
+                "status_code": 400,
+                "message": f"{user_profile.first_name} is not a member of this room.",
+            }
+        elif room.member == admin_id:
+            results = {
+                "status_code": 400,
+                "message": "You can't ban yourself!",
+            }
+        elif room:
+            logger.info(
+                f"`{admin_id}` has banned" f" from room `{room_name}`!"
+            )
+            await delete_room_user(room.member, room_obj.id, session)
+            results = {
+                "status_code": 200,
+                "message": f"{user_profile.first_name} has been banned from this room.",
+            }
+        return results

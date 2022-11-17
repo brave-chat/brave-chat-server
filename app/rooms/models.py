@@ -1,7 +1,12 @@
+from enum import Enum
 from sqlalchemy import (
     Column,
     ForeignKey,
+    Integer,
     String,
+)
+from typing import (
+    Optional,
 )
 
 from app.utils.mixins import (
@@ -9,6 +14,16 @@ from app.utils.mixins import (
     CommonMixin,
     TimestampMixin,
 )
+
+
+class UserStatus(int, Enum):
+    banned = 1
+    not_banned = 0
+
+
+class UserRole(int, Enum):
+    admin = 1
+    not_admin = 0
 
 
 class Rooms(Base, CommonMixin, TimestampMixin):
@@ -29,3 +44,5 @@ class RoomMembers(Base, CommonMixin, TimestampMixin):
 
     room: int = Column(ForeignKey("rooms.id"), index=True)
     member: int = Column(ForeignKey("users.id"), index=True)
+    banned: Optional[UserStatus] = Column(Integer, index=True)
+    admin: Optional[UserRole] = Column(Integer, index=True)

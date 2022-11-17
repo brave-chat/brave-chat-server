@@ -1,6 +1,7 @@
 import datetime
 from pydantic import (
     BaseModel,
+    EmailStr,
     Field,
 )
 from typing import (
@@ -36,3 +37,8 @@ class LeaveRoom(BaseModel):
 
 class DeleteRoomConversation(BaseModel):
     room_name: str = Field(..., example="A room name to delete messages.")
+
+
+class BanUserRoom(BaseModel):
+    room_name: str = Field(..., example="A room name.")
+    email: EmailStr = Field(..., example="A user email to ban.")
