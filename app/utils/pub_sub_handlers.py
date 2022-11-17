@@ -29,7 +29,11 @@ from app.chats.crud import (
     send_new_message,
 )
 from app.rooms.crud import (
+    ban_user_from_room,
+    find_admin_in_room,
+    find_existed_room,
     send_new_room_message,
+    unban_user_from_room,
 )
 from app.users.crud import (
     update_chat_status,
@@ -63,6 +67,8 @@ async def consumer_handler(
 ) -> None:
     try:
         user = await find_existed_user_id(sender_id, session)
+        room = None
+        admin = None
         if receiver_id:
             data = {
                 "content": f"{user.first_name} is online!",
@@ -70,6 +76,8 @@ async def consumer_handler(
                 "user": dict(user),
             }
         else:
+            room = await find_existed_room(topic, session)
+            admin = await find_admin_in_room(sender_id, room.id, session)
             data = {
                 "content": f"{user.first_name} is online!",
                 "room_name": topic,
@@ -84,6 +92,8 @@ async def consumer_handler(
                 data = await web_socket.receive_text()
                 message_data = json.loads(data)
                 message_data["user"] = dict(user)
+                if room and not admin:
+                    message_data["user"]["admin"] = 1
                 if message_data.get("type", None) == "leave":
                     logger.warning(message_data)
                     logger.info("Disconnecting from Websocket")
@@ -135,6 +145,30 @@ async def consumer_handler(
                         topic, json.dumps(message_data, default=str)
                     )
                     del request
+                elif message_data.get("type", None) == "ban":
+                    ensure_future(
+                        ban_user_from_room(
+                            admin_id=sender_id,
+                            user_email=message_data["receiver"],
+                            room_name=message_data["room_name"],
+                            session=session,
+                        )
+                    )
+                    await connection.publish(
+                        topic, json.dumps(message_data, default=str)
+                    )
+                elif message_data.get("type", None) == "unban":
+                    ensure_future(
+                        unban_user_from_room(
+                            admin_id=sender_id,
+                            user_email=message_data["receiver"],
+                            room_name=message_data["room_name"],
+                            session=session,
+                        )
+                    )
+                    await connection.publish(
+                        topic, json.dumps(message_data, default=str)
+                    )
                 else:
                     logger.info(
                         f"CONSUMER RECIEVED: {json.dumps(message_data, default=str)}"  # noqa: E501

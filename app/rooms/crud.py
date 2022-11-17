@@ -161,6 +161,48 @@ async def delete_room_user(user_id: int, room_id: int, session: AsyncSession):
     return await session.execute(text(query), values)
 
 
+async def ban_room_user(user_id: int, room_id: int, session: AsyncSession):
+    query = """
+        UPDATE
+          room_members
+        SET
+          banned = 1,
+          modified_date = :modified_date
+        WHERE
+          room = :room
+        AND
+          member = :member
+    """
+    values = {
+        "room": room_id,
+        "member": user_id,
+        "modified_date": datetime.datetime.utcnow(),
+    }
+
+    return await session.execute(text(query), values)
+
+
+async def unban_room_user(user_id: int, room_id: int, session: AsyncSession):
+    query = """
+        UPDATE
+          room_members
+        SET
+          banned = 0,
+          modified_date = :modified_date
+        WHERE
+          room = :room
+        AND
+          member = :member
+    """
+    values = {
+        "room": room_id,
+        "member": user_id,
+        "modified_date": datetime.datetime.utcnow(),
+    }
+
+    return await session.execute(text(query), values)
+
+
 async def create_assign_new_room(
     user_id: int, room_obj, session: AsyncSession
 ):
@@ -206,12 +248,19 @@ async def create_assign_new_room(
     else:
         user = await find_existed_user_in_room(user_id, room.id, session)
         if user and room_obj.join == 1:
-            logger.info(f"`{user_id}` has already joined this room!")
-            results = {
-                "status_code": 400,
-                "message": "You have already joined room "
-                f"{room_obj.room_name}!",
-            }
+            if user.banned == 1:
+                logger.info(f"`{user_id}` can't join this room!")
+                results = {
+                    "status_code": 400,
+                    "message": "You have been banned from this room.",
+                }
+            else:
+                logger.info(f"`{user_id}` has already joined this room!")
+                results = {
+                    "status_code": 400,
+                    "message": "You have already joined room"
+                    f"{room_obj.room_name}!",
+                }
         elif not user and room_obj.join == 1:
             await join_room(user_id, room.id, session)
             logger.info(
@@ -239,36 +288,75 @@ async def get_room_conversations(
             "status_code": 400,
             "message": "Room not found!",
         }
-    query = """
-        SELECT
-            messages.id as msg_id,
-            messages.content,
-            CASE
-                WHEN messages.sender = :sender_id THEN "sent"
-                ELSE "received"
-            END as type,
-            messages.media,
-            messages.creation_date,
-            users.id as id,
-            users.first_name,
-            users.last_name,
-            users.bio,
-            users.chat_status,
-            users.email,
-            users.phone_number,
-            users.profile_picture
-
-        FROM
-            messages
-        LEFT JOIN
-            users
-        ON
-          messages.sender = users.id
-        WHERE
-          messages.room = :room_id
-        ORDER BY
-          messages.creation_date
-    """
+    # test if sender_id is admin
+    admin = await find_admin_in_room(sender_id, room.id, session)
+    if admin:
+        query = """
+            SELECT
+                messages.id as msg_id,
+                messages.content,
+                CASE
+                    WHEN messages.sender = :sender_id THEN "sent"
+                    ELSE "received"
+                END as type,
+                messages.media,
+                messages.creation_date,
+                users.id as id,
+                users.first_name,
+                users.last_name,
+                users.bio,
+                users.chat_status,
+                users.email,
+                users.phone_number,
+                users.profile_picture,
+                room_members.admin
+            FROM
+                messages
+            LEFT JOIN
+                users
+            ON
+              messages.sender = users.id
+            LEFT JOIN
+                room_members
+            ON
+              messages.room = room_members.room
+            WHERE
+              messages.room = :room_id
+            GROUP BY
+              messages.id
+            ORDER BY
+              messages.creation_date
+        """
+    else:
+        query = """
+            SELECT
+                messages.id as msg_id,
+                messages.content,
+                CASE
+                    WHEN messages.sender = :sender_id THEN "sent"
+                    ELSE "received"
+                END as type,
+                messages.media,
+                messages.creation_date,
+                users.id as id,
+                users.first_name,
+                users.last_name,
+                users.bio,
+                users.chat_status,
+                users.email,
+                users.phone_number,
+                users.profile_picture
+            FROM
+                messages
+            LEFT JOIN
+                users
+            ON
+              messages.sender = users.id
+            WHERE
+              messages.room = :room_id
+            ORDER BY
+              messages.creation_date
+        """
     values = {"room_id": room.id, "sender_id": sender_id}
     result = await session.execute(text(query), values)
     messages_sent_received = result.fetchall()
@@ -353,7 +441,7 @@ async def leave_room_user(user_id: int, room_name, session: AsyncSession):
 
 
 async def delete_room_user_chat(
-    user_id: int, room_name, session: AsyncSession
+    user_id: int, room_name: str, session: AsyncSession
 ):
     if not room_name:
         results = {
@@ -401,6 +489,8 @@ async def search_rooms(search: str, user_id: int, session: AsyncSession):
               room_members.room= rooms.id
             WHERE
               room_members.member= :user_id
+            AND
+              room_members.banned= 0
         """
         values = {"user_id": user_id}
         result = await session.execute(text(query), values)
@@ -421,6 +511,8 @@ async def search_rooms(search: str, user_id: int, session: AsyncSession):
               room_members.member= :user_id
             AND
               INSTR(room_name, :search) > 0
+            AND
+              room_members.banned= 0
         """
         values = {"user_id": user_id, "search": search.lower()}
         result = await session.execute(text(query), values)
@@ -444,6 +536,8 @@ async def get_rooms_user(user_id: int, session: AsyncSession):
           room_members.room= rooms.id
         WHERE
           room_members.member= :user_id
+        AND
+          room_members.banned= 0
     """
     values = {"user_id": user_id}
 
@@ -498,9 +592,65 @@ async def ban_user_from_room(
             logger.info(
                 f"`{admin_id}` has banned" f" from room `{room_name}`!"
             )
-            await delete_room_user(room.member, room_obj.id, session)
+            results = await delete_room_user_chat(
+                room.member, room_name, session
+            )
+            await ban_room_user(room.member, room_obj.id, session)
             results = {
                 "status_code": 200,
                 "message": f"{user_profile.first_name} has been banned from this room.",
+            }
+        return results
+
+
+async def unban_user_from_room(
+    admin_id: int, user_email: EmailStr, room_name: str, session: AsyncSession
+):
+    room_name = room_name.lower()
+    if not room_name:
+        return {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+    room_obj = await find_existed_room(room_name, session)
+    if not room_obj:
+        return {
+            "status_code": 400,
+            "message": "Room doesn't exist!",
+        }
+    admin = await find_admin_in_room(admin_id, room_obj.id, session)
+    if not admin:
+        return {
+            "status_code": 400,
+            "message": "You are not the admin of this room!",
+        }
+    else:
+        user_profile = await find_existed_user(user_email, session)
+        if not user_profile:
+            return {
+                "status_code": 400,
+                "message": "User not found!",
+            }
+        room = await find_existed_user_in_room(
+            user_profile.id, room_obj.id, session
+        )
+        if not room:
+            results = {
+                "status_code": 400,
+                "message": f"{user_profile.first_name} is not a member of this room.",
+            }
+        elif room.member == admin_id:
+            results = {
+                "status_code": 400,
+                "message": "You can't unban yourself!",
+            }
+        elif room:
+            logger.info(
+                f"`{admin_id}` has been unbanned" f" from room `{room_name}`!"
+            )
+            await unban_room_user(room.member, room_obj.id, session)
+            results = {
+                "status_code": 200,
+                "message": f"{user_profile.first_name} has been unbanned.",
             }
         return results
