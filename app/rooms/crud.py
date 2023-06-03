@@ -203,6 +203,30 @@ async def unban_room_user(user_id: int, room_id: int, session: AsyncSession):
     return await session.execute(text(query), values)
 
 
+async def update_room_invite_link(
+    room_name: str, invite_link: str, session: AsyncSession
+):
+    query = """
+        UPDATE
+          rooms
+        SET
+          invite_link = :invite_link,
+          modified_date = :modified_date,
+          link_expire_date = :link_expire_date
+        WHERE
+          room_name = :room_name
+    """
+    values = {
+        "invite_link": invite_link,
+        "modified_date": datetime.datetime.utcnow(),
+        "link_expire_date": datetime.datetime.utcnow()
+        + datetime.timedelta(minutes=120),
+        "room_name": room_name,
+    }
+
+    return await session.execute(text(query), values)
+
+
 async def create_assign_new_room(
     user_id: int, room_obj, session: AsyncSession
 ):
@@ -654,3 +678,88 @@ async def unban_user_from_room(
                 "message": f"{user_profile.first_name} has been unbanned.",
             }
         return results
+
+
+async def invite_user_to_room(
+    user_id: int,
+    user_email: EmailStr,
+    room_name: str,
+    invite_link: str,
+    session: AsyncSession,
+):
+    room_name = room_name.lower()
+    if not room_name:
+        return {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+    room_obj = await find_existed_room(room_name, session)
+    if not room_obj:
+        return {
+            "status_code": 400,
+            "message": "Room doesn't exist!",
+        }
+
+    user_profile = await find_existed_user(user_email, session)
+    if not user_profile:
+        return {
+            "status_code": 400,
+            "message": "User not registered!",
+        }
+    room = await find_existed_user_in_room(
+        user_profile.id, room_obj.id, session
+    )
+    if (
+        not room
+        and room_obj.invite_link == invite_link
+        and datetime.datetime.utcnow() < room_obj.link_expire_date
+    ):
+        await join_room(user_id, room_obj.id, session, True)
+        logger.info(
+            f"Adding {user_id} to room `{room_obj.room_name}` as a member."
+        )
+        results = {
+            "status_code": 200,
+            "message": f"You have joined room {room_obj.room_name}!",
+        }
+    elif room_obj.invite_link != invite_link:
+        results = {
+            "status_code": 400,
+            "message": "Invalid invite link url!",
+        }
+    else:
+        results = {
+            "status_code": 400,
+            "message": f"You have already joined room `{room_name}`!",
+        }
+    return results
+
+
+async def create_invite_link(
+    room_name: str, invite_link: str, session: AsyncSession
+):
+    room_name = room_name.lower()
+    results = None
+    if not room_name:
+        results = {
+            "status_code": 400,
+            "message": "Make sure the room name is not empty!",
+        }
+    elif not invite_link:
+        results = {
+            "status_code": 400,
+            "message": "Make sure the invite link is not empty!",
+        }
+    room_obj = await find_existed_room(room_name, session)
+    if not room_obj:
+        results = {
+            "status_code": 400,
+            "message": "Room doesn't exist!",
+        }
+    if not results:
+        await update_room_invite_link(room_name, invite_link, session)
+        results = {
+            "status_code": 200,
+            "message": "Room link has been updated successfully!",
+        }
+    return results
