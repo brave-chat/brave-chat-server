@@ -9,8 +9,6 @@ from pydantic import (
 )
 from typing import (
     Any,
-    Dict,
-    List,
     Optional,
 )
 
@@ -80,11 +78,11 @@ class GetAllMessageResults(BaseModel):
 
     Args:
         status_code (int) : A response status code.
-        result (List[Dict[str, Any]]) : A secure password.
+        result (list[dict[str, Any]]) : A secure password.
     """
 
     status_code: int = Field(..., example=200)
-    result: List[Dict[str, Any]]
+    result: list[dict[str, Any]]
 
 
 class DeleteChatMessages(BaseModel):

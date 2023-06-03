@@ -15,9 +15,6 @@ from pydantic import (
 from tempfile import (
     gettempdir,
 )
-from typing import (
-    List,
-)
 
 TEMP_DIR = Path(gettempdir())
 
@@ -127,7 +124,7 @@ class Settings(BaseSettings):
         return sqlalchemy_database_url
 
     @property
-    def cors_origins(self) -> List[str]:
+    def cors_origins(self) -> list[str]:
         """
         Build a list of urls from a comma separated values string.
 
@@ -135,7 +132,7 @@ class Settings(BaseSettings):
             self ( _obj_ ) : object reference.
 
         Returns:
-            List[str]: A list of urls.
+            list[str]: A list of urls.
         """
         return (
             [url.strip() for url in self.CORS_ORIGINS.split(",") if url]

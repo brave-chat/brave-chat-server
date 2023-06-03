@@ -12,8 +12,6 @@ from sqlalchemy import (
     String,
 )
 from typing import (
-    Dict,
-    List,
     Optional,
     Union,
 )
@@ -49,7 +47,7 @@ class AccessTokens(Base, CommonMixin, TimestampMixin):  # pylint: disable=R0903
         token_status (TokenStatus) : A token status.
     """
 
-    __table_args__: Dict[str, Union[str, List[str]]] = {
+    __table_args__: dict[str, Union[str, list[str]]] = {
         "mysql_engine": "InnoDB",
         "prefixes": ["ROWSTORE", "REFERENCE"],
     }

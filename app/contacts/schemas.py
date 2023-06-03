@@ -2,7 +2,6 @@ from pydantic import (
     BaseModel,
 )
 from typing import (
-    List,
     Optional,
 )
 
@@ -19,7 +18,7 @@ class ContactCreate(BaseModel):
 
 class GetAllContactsResults(BaseModel):
     status_code: int
-    result: List[UserObjectSchema]
+    result: list[UserObjectSchema]
 
 
 class AddContact(BaseModel):
