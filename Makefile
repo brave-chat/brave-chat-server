@@ -10,6 +10,7 @@ help:
 	@echo "venv                     Create a virtual environment"
 	@echo "install                  Install the package and all required core dependencies"
 	@echo "run                      Running the app locally"
+	@echo "create-deta              Set up a new Deta Space environment"
 	@echo "deploy-deta              Deploy the app on a Deta Micro"
 	@echo "clean                    Remove all build, test, coverage and Python artifacts"
 	@echo "lint                     Check style with pre-commit"
@@ -129,21 +130,26 @@ run:
 	poetry run server
 	@echo ""
 
+create-deta:
+	@echo ""
+	@echo "*** Setting up a new Deta Space environment... ***"
+	@echo ""
+	@echo "*** Running `space login`... ***"
+	space login
+	@echo "*** Running `space new --name brave-chat-server`... ***"
+	: `space new --name brave-chat`
+	@echo "Append '    run: uvicorn main:app' to your Spacefile file..."
+	@echo ""
+
 deploy-deta:
 	@echo ""
-	@echo "*** Deploying the app on a Deta Micros... ***"
+	@echo "*** Deploying the app to a Deta Space... ***"
 	@echo ""
-	@echo "*** Running `deta login`... ***"
-	deta login
-	@echo "*** Running `deta new .`... ***"
-	deta new .
-	@echo "*** Running `deta deploy`... ***"
-	deta deploy
-	@echo "*** Running `deta auth disable`... ***"
-	deta auth disable
 	@echo "*** Running `deta update -e .env`... ***"
 	deta update -e .env
 	@echo ""
+	@echo "*** Running `space push`... ***"
+	space push
 
 dist: clean ## builds source and wheel package
 	poetry build

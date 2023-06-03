@@ -211,7 +211,7 @@ def serve() -> None:
     try:
         set_multiproc_dir()
         uvicorn.run(
-            "app.main:chat_app",
+            "app:chat_app",
             host="0.0.0.0",
             workers=4,
             port=8000,

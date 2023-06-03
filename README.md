@@ -147,6 +147,7 @@ Please use 'make <target>' where <target> is one of:
 venv                     Create a virtual environment
 install                  Install the package and all required core dependencies
 run                      Running the app locally
+create-deta              Set up a new Deta Space environment
 deploy-deta              Deploy the app on a Deta Micro
 clean                    Remove all build, test, coverage and Python artifacts
 lint                     Check style with pre-commit
@@ -217,11 +218,25 @@ REDIS_PORT=15065
 
 ### 8. Create a Deta account
 
-Create a free account on [Deta](https://www.deta.sh/), and create a new project.
+- Create a [Deta space](https://deta.space/), and then create a new collection.
+
+![Deta Space UI](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-ui.png)
+
+![Deta create new collection](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-create-collection.png)
+
+- Attach two drives, namely `sent-images` and `profile-images`, to this collection to store profile images and images sent in a conversation.
+
+![Deta create new drive](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-create-drive.png)
+
+![Deta create new drive name](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-drive-name.png)
+
+- Create a new data key and copy it for the next step:
+
+![Deta create new project key](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-project-key.png)
 
 ### 9. Set your Deta project key
 
-Set the following environment variable in your `.env` file according to your project key value:
+Set the following environment variable in your `.env` file according to your data key value:
 
 ```yaml
 # Deta
@@ -332,16 +347,36 @@ You'll need to create a Deta account to use the Deta version of the APIs.
 Make sure you have Deta CLI installed on your machine. If it is not the case, just run the following command(on a Linux distro or Mac):
 
 ```sh
-curl -fsSL https://get.deta.dev/cli.sh | sh
+curl -fsSL https://get.deta.dev/space-cli.sh | sh
 ```
 
-Manually add `/home/<user_name>/.deta/bin/deta` to your path:
+Manually add `/home/<user_name>/.detaspace/bin` to your path:
 
 ```sh
-PATH="/home/<user_name>/.deta/bin:$PATH"
+export PATH="/home/<user_name>/.detaspace/bin:$PATH"
 ```
 
-Now you can deploy the app on a Deta Micro:
+You can run the following command to set up a new Deta Space environment:
+
+```sh
+make create-deta
+```
+
+Generate a new access token and paste it into your terminal:
+
+![Deta space generate access token](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-generate-access-token.png)
+
+![Deta space generate access token button](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-generate-token.png)
+
+![Deta space copy access token](https://raw.githubusercontent.com/brave-chat/brave-chat/docs/docs/static/images/deta-space-copy-access-token-button.png)
+
+You need to append `    run: uvicorn main:app` to the end of your `Spacefile` file:
+
+```sh
+sed -i '$ a \ \ \ \ run: uvicorn main:app' Spacefile
+```
+
+Now, you can deploy it on Deta Space:
 
 ```sh
 make deploy-deta
@@ -354,8 +389,6 @@ You can then use the Deta UI to check the logs and the URL the API is hosted on.
 - _Make sure your `.env` file is being provided with valid env vars values accordingly._
 
 - _The `main.py` file is used as an entry point for Deta. The same goes for `requirements.txt`._
-
-- _Deta Micros are limited to 512MB per deployment._
 
 ### Heroku
 

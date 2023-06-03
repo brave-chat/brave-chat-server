@@ -77,14 +77,6 @@ async def send_message(
 ):
     """
     The send_message endpoint.
-
-    Args:
-        request (MessageCreate) : A `MessageCreate` schema that contains info about the recipient.
-        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
-        session (AsyncSession) : An autocommit sqlalchemy session object.
-
-    Returns:
-        ResponseSchema: return a response schema object.
     """
     results = await send_new_message(
         currentUser.id, request, None, None, session
@@ -113,14 +105,6 @@ async def get_conversation(
 ):
     """
     The get_conversation endpoint.
-
-    Args:
-        receiver (EmailStr) : The recipient email.
-        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
-        session (AsyncSession) : An autocommit sqlalchemy session object.
-
-    Returns:
-        ResponseSchema | GetAllMessageResults: return a list of messages between sender and receiver
     """
     results = await get_sender_receiver_messages(
         currentUser, receiver, session
@@ -142,14 +126,6 @@ async def get_chats_user_list(
 ):
     """
     The get_chats_user_list endpoint.
-
-    Args:
-        search (str) : first name to perform a basic search.
-        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
-        session (AsyncSession) : An autocommit sqlalchemy session object.
-
-    Returns:
-        ResponseSchema | GetAllMessageResults: return a list of messages between sender and receiver
     """
     results = await get_chats_user(currentUser.id, search, session)
     return results
@@ -169,14 +145,6 @@ async def get_chats_user_search_list(
 ):
     """
     The get_chats_user_search_list endpoint.
-
-    Args:
-        search (str) : first name to perform a basic search.
-        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
-        session (AsyncSession) : An autocommit sqlalchemy session object.
-
-    Returns:
-        list: return a list of users that has messages between sender and receiver.
     """
     results = await get_chats_user(currentUser.id, search, session)
     return results
@@ -208,14 +176,6 @@ async def delete_user_chat(
 ):
     """
     The delete_user_chat endpoint.
-
-    Args:
-        contact (DeleteChatMessages) : A schema object for the contact.
-        currentUser (UserObjectSchema): The authenticated user as the sender of the message.
-        session (AsyncSession) : An autocommit sqlalchemy session object.
-
-    Returns:
-        ResponseSchema: return a response that indicates whether or not the delete was successful.
     """
     results = await delete_chat_messages(
         currentUser.id, contact.contact, session
@@ -227,13 +187,6 @@ async def delete_user_chat(
 async def get_sent_user_chat_images(user_id: int, uuid_val: str):
     """
     The get_sent_user_chat_images endpoint.
-
-    Args:
-        user_id (id) : The id of the sender of the image.
-        uuid_val (str): A unique uuid generated upon upload.
-
-    Returns:
-        responses: return a response object for a given url(image).
     """
     try:
         img = sent_images.get(f"/chat/images/user/{user_id}/{uuid_val}")

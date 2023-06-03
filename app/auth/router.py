@@ -65,13 +65,6 @@ async def login(
 ):
     """
     The login endpoint.
-
-    Args:
-        form_data (OAuth2PasswordRequestForm) : OAuth2 request form.
-        session (AsyncSession) : An autocommit sqlalchemy session object.
-
-    Returns:
-        Token | ResponseSchema: return access token dict, or response schema object.
     """
     access_token = await login_user(form_data, session)
     return access_token
@@ -100,13 +93,6 @@ async def register(
 ):
     """
     The register endpoint.
-
-    Args:
-        user (UserCreate) : A UserCreate schema object.
-        session (AsyncSession) : A transactional sqlalchemy session object.
-
-    Returns:
-        UserCreate | ResponseSchema: return UserCreate or ResponseSchema object.
     """
     results = await register_user(user, session)
     return results

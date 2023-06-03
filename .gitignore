@@ -136,3 +136,5 @@ database.db
 
 # Ignore deta config file
 .deta/
+.space
+Spacefile

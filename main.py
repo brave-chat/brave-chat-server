@@ -3,7 +3,7 @@ from sys import path
 
 path.append(".")
 
-from app.main import (
+from app import (
     chat_app,
 )
 

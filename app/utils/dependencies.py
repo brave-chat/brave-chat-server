@@ -62,7 +62,7 @@ async def get_db_autocommit_session_socket() -> AsyncGenerator[
     :param request: current request.
     :yield: database session.
     """
-    from app.main import (
+    from app import (
         chat_app,
     )
 
