@@ -20,9 +20,11 @@ from app.config import (
 from app.rooms.crud import (
     ban_user_from_room,
     create_assign_new_room,
+    create_invite_link,
     delete_room_user_chat,
     get_room_conversations,
     get_rooms_user,
+    invite_user_to_room,
     leave_room_user,
     search_rooms,
     send_new_room_message,
@@ -30,6 +32,8 @@ from app.rooms.crud import (
 from app.rooms.schemas import (
     BanUserRoom,
     DeleteRoomConversation,
+    InviteRoomLink,
+    InviteUserRoom,
     LeaveRoom,
     RoomCreate,
 )
@@ -232,5 +236,67 @@ async def ban_a_user_from_a_room(
     """
     results = await ban_user_from_room(
         currentUser.id, room.email, room.room_name, session
+    )
+    return results
+
+
+@router.post(
+    "/room/user/invite",
+    status_code=200,
+    name="room:invite-user-room",
+    responses={
+        200: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates a user has"
+            " joined the room.",
+        },
+        400: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates if a user"
+            " doesn't exist.",
+        },
+    },
+)
+async def invite_a_user_to_a_room(
+    room: InviteUserRoom,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    """
+    Invite a user to a given room.
+    """
+    results = await invite_user_to_room(
+        currentUser.id, room.email, room.room_name, room.invite_link, session
+    )
+    return results
+
+
+@router.post(
+    "/room/invite/link",
+    status_code=200,
+    name="room:create-invite-link",
+    responses={
+        200: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates a link has"
+            " been saved in the room.",
+        },
+        400: {
+            "model": ResponseSchema,
+            "description": "Return a message that indicates if something"
+            " went wrong.",
+        },
+    },
+)
+async def create_an_invite_link(
+    room: InviteRoomLink,
+    currentUser: UserObjectSchema = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_db_autocommit_session),
+):
+    """
+    Create an invite link for a given room.
+    """
+    results = await create_invite_link(
+        room.room_name, room.invite_link, session
     )
     return results

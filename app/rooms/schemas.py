@@ -42,3 +42,14 @@ class DeleteRoomConversation(BaseModel):
 class BanUserRoom(BaseModel):
     room_name: str = Field(..., example="A room name.")
     email: EmailStr = Field(..., example="A user email to ban.")
+
+
+class InviteUserRoom(BaseModel):
+    room_name: str = Field(..., example="A room name.")
+    email: EmailStr = Field(..., example="A user email to join.")
+    invite_link: str = Field(..., example="An absolute URL to join the room.")
+
+
+class InviteRoomLink(BaseModel):
+    room_name: str = Field(..., example="A room name.")
+    invite_link: str = Field(..., example="An absolute URL to join the room.")

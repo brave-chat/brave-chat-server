@@ -1,6 +1,8 @@
+import datetime
 from enum import Enum
 from sqlalchemy import (
     Column,
+    DateTime,
     ForeignKey,
     Integer,
     String,
@@ -32,8 +34,12 @@ class Rooms(Base, CommonMixin, TimestampMixin):
         "prefixes": ["ROWSTORE", "REFERENCE"],
     }
 
-    room_name: int = Column(String(20), index=True)
+    room_name: str = Column(String(20), index=True)
     description: str = Column(String(60))
+    invite_link: Optional[str] = Column(String(220))
+    link_expire_date: Optional[datetime.datetime] = Column(
+        DateTime, default=datetime.datetime.utcnow()
+    )
 
 
 class RoomMembers(Base, CommonMixin, TimestampMixin):
