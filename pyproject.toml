@@ -32,7 +32,7 @@ PyJWT = "^2.4.0"
 uvicorn = {extras = ["standard"], version = "^0.18.3"}
 python-multipart = "^0.0.5"
 deta = "^1.1.0"
-pydantic = {extras = ["email"], version = "^1.9.2"}
+pydantic = {extras = ["email"], version = "^1.10.10"}
 SQLAlchemy = "==1.4.41"
 aiomysql = "^0.1.1"
 aioredis = "^2.0.1"
