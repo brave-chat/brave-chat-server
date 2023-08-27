@@ -29,9 +29,6 @@ from app.auth.crud import (
 from app.chats.crud import (
     send_new_message,
 )
-from app.config import (
-    settings,
-)
 from app.rooms.crud import (
     ban_user_from_room,
     find_admin_in_room,
@@ -191,9 +188,7 @@ async def consumer_handler(
                     message_data["content"] = ""
                     for resp in openai.ChatCompletion.create(
                         model="gpt-3.5-turbo",
-                        messages=[
-                            dict(role="user", content=content)
-                        ],
+                        messages=[dict(role="user", content=content)],
                         stream=True,
                     ):
                         resp = resp.choices[0]
