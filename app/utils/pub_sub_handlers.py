@@ -11,6 +11,7 @@ from fastapi.websockets import (
 )
 import json
 import logging
+import openai
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
@@ -169,6 +170,37 @@ async def consumer_handler(
                     await connection.publish(
                         topic, json.dumps(message_data, default=str)
                     )
+                elif message_data.get("type", None) == "chatgpt":
+                    content = message_data["content"]
+                    message_data["user"] = {
+                        "id": 100000000000000000,
+                        "first_name": "ChatGPT",
+                        "last_name": "",
+                        "bio": None,
+                        "chat_status": "online",
+                        "email": "chatgpt@brave-chat.net",
+                        "phone_number": None,
+                    }
+                    message_data["content"] = "start"
+                    await connection.publish(
+                        topic, json.dumps(message_data, default=str)
+                    )
+                    message_data["content"] = ""
+                    for resp in openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=[dict(role="user", content=content)],
+                        stream=True,
+                    ):
+                        resp = resp.choices[0]
+                        if "content" not in resp["delta"]:
+                            continue
+                        if resp["finish_reason"] == "stop":
+                            break
+                        message_data["content"] += resp["delta"]["content"]
+                        print(message_data["content"])
+                        await connection.publish(
+                            topic, json.dumps(message_data, default=str)
+                        )
                 else:
                     logger.info(
                         f"CONSUMER RECIEVED: {json.dumps(message_data, default=str)}"  # noqa: E501

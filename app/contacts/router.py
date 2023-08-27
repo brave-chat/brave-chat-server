@@ -77,10 +77,6 @@ async def add_contact(
             "model": GetAllContactsResults,
             "description": "A list of contacts for each user.",
         },
-        400: {
-            "model": ResponseSchema,
-            "description": "User not found.",
-        },
     },
 )
 async def get_contacts_user(
@@ -102,11 +98,6 @@ async def get_contacts_user(
         200: {
             "model": GetAllContactsResults,
             "description": "A list of filtered contacts.",
-        },
-        400: {
-            "model": ResponseSchema,
-            "description": "User can't search against an empty string, or"
-            " User not found.",
         },
     },
 )

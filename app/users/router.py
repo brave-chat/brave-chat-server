@@ -9,6 +9,7 @@ from fastapi import (
 from fastapi.encoders import (
     jsonable_encoder,
 )
+import openai
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
@@ -158,3 +159,14 @@ async def get_profile_user_image(user_id: int):
         )
     except Exception as e:
         return {"status_code": 400, "message": str(e)}
+
+
+@router.get("/user/openai/key", status_code=200, name="users:openai-key")
+def set_openai_api_key(
+    apiKey: str,
+    _currentUser: UserObjectSchema = Depends(jwt_util.get_current_active_user),
+):
+    """
+    set the openai API key
+    """
+    openai.api_key = apiKey
