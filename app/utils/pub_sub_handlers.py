@@ -192,7 +192,7 @@ async def consumer_handler(
                         stream=True,
                     ):
                         resp = resp.choices[0]
-                        if not "content" in resp["delta"]:
+                        if "content" not in resp["delta"]:
                             continue
                         if resp["finish_reason"] == "stop":
                             break
