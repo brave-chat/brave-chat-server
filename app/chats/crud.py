@@ -408,6 +408,11 @@ async def get_sender_receiver_messages(
     Returns:
         Result: Database result.
     """
+    if receiver == "chatgpt@brave-chat.net":
+        return {
+            "status_code": 400,
+            "message": "Contact not found!",
+        }
     receiver = await find_existed_user(email=receiver, session=session)
     if not receiver:
         return {
@@ -481,6 +486,20 @@ async def get_chats_user(user_id: int, search: str, session: AsyncSession):
         Result: Database result.
     """
     messages = await find_existed_user_messages(user_id, session)
+    chatgpt = {
+        "message_id": 100000000000000000,
+        "content": "",
+        "last_message_time": "",
+        "id": 100000000000000000,
+        "nb_unread_message": 0,
+        "first_name": "ChatGPT",
+        "last_name": "",
+        "bio": None,
+        "chat_status": "online",
+        "email": "chatgpt@brave-chat.net",
+        "phone_number": None,
+        "profile_picture": "user/1125899906842626/profile.png",
+    }
     if messages:
         if search:
             query = """
@@ -550,9 +569,10 @@ async def get_chats_user(user_id: int, search: str, session: AsyncSession):
                     for myObject in contacts
                 }.values()
             )
+        contacts.insert(0, chatgpt)
         results = {"status_code": 200, "result": contacts}
         return results
     return {
         "status_code": 200,
-        "message": "There are no messages sent to you!",
+        "result": [chatgpt],
     }

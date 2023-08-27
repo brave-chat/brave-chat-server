@@ -597,7 +597,7 @@ async def ban_user_from_room(
         if not user_profile:
             return {
                 "status_code": 400,
-                "message": "User not found!",
+                "message": "",
             }
         room = await find_existed_user_in_room(
             user_profile.id, room_obj.id, session
@@ -653,7 +653,7 @@ async def unban_user_from_room(
         if not user_profile:
             return {
                 "status_code": 400,
-                "message": "User not found!",
+                "message": "",
             }
         room = await find_existed_user_in_room(
             user_profile.id, room_obj.id, session

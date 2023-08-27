@@ -38,6 +38,7 @@ from app.utils.dependencies import (
     get_db_autocommit_session,
     get_db_transactional_session,
 )
+import openai
 
 deta = Deta(settings.DETA_PROJECT_KEY)
 
@@ -158,3 +159,17 @@ async def get_profile_user_image(user_id: int):
         )
     except Exception as e:
         return {"status_code": 400, "message": str(e)}
+
+@router.get(
+    "/user/openai/key",
+    status_code=200,
+    name="users:openai-key"
+)
+def set_openai_api_key(
+    apiKey: str,
+    _currentUser: UserObjectSchema = Depends(jwt_util.get_current_active_user),
+):
+    """
+    set the openai API key
+    """
+    openai.api_key = apiKey

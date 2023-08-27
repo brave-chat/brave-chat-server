@@ -26,17 +26,17 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.9.10"
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-fastapi = {extras = ["uvicorn"], version = "^0.81.0"}
-PyJWT = "^2.4.0"
-uvicorn = {extras = ["standard"], version = "^0.18.3"}
-python-multipart = "^0.0.5"
-deta = "^1.1.0"
-pydantic = {extras = ["email"], version = "^1.9.2"}
+passlib = {extras = ["bcrypt"], version = "==1.7.4"}
+fastapi = {extras = ["uvicorn"], version = "==0.81.0"}
+PyJWT = "==2.4.0"
+uvicorn = {extras = ["standard"], version = "==0.18.3"}
+python-multipart = "==0.0.5"
+deta = "==1.1.0"
+pydantic = {extras = ["email"], version = "==1.9.2"}
 SQLAlchemy = "==1.4.41"
-aiomysql = "^0.1.1"
-aioredis = "^2.0.1"
-prometheus-fastapi-instrumentator = "^5.9.1"
+aiomysql = "==0.1.1"
+aioredis = "==2.0.1"
+prometheus-fastapi-instrumentator = "==5.9.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.1.0"
