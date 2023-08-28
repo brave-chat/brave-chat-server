@@ -126,7 +126,7 @@ async def get_profile_image(name: str):
             img.iter_chunks(), media_type="image/png"
         )
     except Exception as e:
-        return {"status_code": 400, "message": str(e)}
+        return {"status_code": 400, "message": "Something went wrong!"}
 
 
 @router.put("/user/profile-image")
@@ -147,7 +147,7 @@ async def upload_profile_image(
         }
 
     except Exception as e:
-        return {"status_code": 400, "message": str(e)}
+        return {"status_code": 400, "message": "Something went wrong!"}
 
 
 @router.get("/profile/user/{user_id}/profile.png")
@@ -157,8 +157,8 @@ async def get_profile_user_image(user_id: int):
         return responses.StreamingResponse(
             img.iter_chunks(), media_type="image/png"
         )
-    except Exception as e:
-        return {"status_code": 400, "message": str(e)}
+    except Exception:
+        return {"status_code": 400, "message": "Something went wrong!"}
 
 
 @router.get("/user/openai/key", status_code=200, name="users:openai-key")

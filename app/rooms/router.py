@@ -201,12 +201,12 @@ async def get_rooms_for_user(
 @router.get("/chat/images/room/{room_id}/{uuid_val}")
 async def get_sent_room_chat_images(room_id: int, uuid_val: str):
     try:
-        img = sent_images.get(f"/chat/images/user/{room_id}/{uuid_val}")
+        img = sent_images.get(f"/chat/images/room/{room_id}/{uuid_val}")
         return responses.StreamingResponse(
             img.iter_chunks(), media_type="image/png"
         )
     except Exception as e:
-        return {"status_code": 400, "message": str(e)}
+        return {"status_code": 400, "message": "Something went wrong!"}
 
 
 @router.delete(
