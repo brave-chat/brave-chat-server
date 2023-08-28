@@ -681,7 +681,6 @@ async def unban_user_from_room(
 
 
 async def invite_user_to_room(
-    user_id: int,
     user_email: EmailStr,
     room_name: str,
     invite_link: str,
@@ -714,9 +713,9 @@ async def invite_user_to_room(
         and room_obj.invite_link == invite_link
         and datetime.datetime.utcnow() < room_obj.link_expire_date
     ):
-        await join_room(user_id, room_obj.id, session, True)
+        await join_room(user_profile.id, room_obj.id, session, True)
         logger.info(
-            f"Adding {user_id} to room `{room_obj.room_name}` as a member."
+            f"Adding {user_profile.id} to room `{room_obj.room_name}` as a member."
         )
         results = {
             "status_code": 200,
@@ -725,12 +724,12 @@ async def invite_user_to_room(
     elif room_obj.invite_link != invite_link:
         results = {
             "status_code": 400,
-            "message": "Invalid invite link url!",
+            "message": "Invalid invite link!",
         }
     else:
         results = {
             "status_code": 400,
-            "message": f"You have already joined room `{room_name}`!",
+            "message": f"You have already joined room {room_name}!",
         }
     return results
 

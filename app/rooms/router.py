@@ -33,7 +33,6 @@ from app.rooms.schemas import (
     BanUserRoom,
     DeleteRoomConversation,
     InviteRoomLink,
-    InviteUserRoom,
     LeaveRoom,
     RoomCreate,
 )
@@ -205,7 +204,7 @@ async def get_sent_room_chat_images(room_id: int, uuid_val: str):
         return responses.StreamingResponse(
             img.iter_chunks(), media_type="image/png"
         )
-    except Exception as e:
+    except Exception:
         return {"status_code": 400, "message": "Something went wrong!"}
 
 
@@ -258,7 +257,7 @@ async def ban_a_user_from_a_room(
     },
 )
 async def invite_a_user_to_a_room(
-    room: InviteUserRoom,
+    room: InviteRoomLink,
     currentUser: UserObjectSchema = Depends(get_current_active_user),
     session: AsyncSession = Depends(get_db_autocommit_session),
 ):
@@ -266,7 +265,7 @@ async def invite_a_user_to_a_room(
     Invite a user to a given room.
     """
     results = await invite_user_to_room(
-        currentUser.id, room.email, room.room_name, room.invite_link, session
+        currentUser.email, room.room_name, room.invite_link, session
     )
     return results
 

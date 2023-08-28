@@ -125,7 +125,7 @@ async def get_profile_image(name: str):
         return responses.StreamingResponse(
             img.iter_chunks(), media_type="image/png"
         )
-    except Exception as e:
+    except Exception:
         return {"status_code": 400, "message": "Something went wrong!"}
 
 
@@ -146,7 +146,7 @@ async def upload_profile_image(
             "message": "Profile picture has been updated!",
         }
 
-    except Exception as e:
+    except Exception:
         return {"status_code": 400, "message": "Something went wrong!"}
 
 
