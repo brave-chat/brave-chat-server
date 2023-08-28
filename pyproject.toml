@@ -37,6 +37,7 @@ SQLAlchemy = "==1.4.41"
 aiomysql = "==0.1.1"
 aioredis = "==2.0.1"
 prometheus-fastapi-instrumentator = "==5.9.1"
+openai = "==0.27.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.1.0"
