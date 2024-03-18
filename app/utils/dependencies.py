@@ -53,9 +53,9 @@ async def get_db_autocommit_session(
         await session.close()
 
 
-async def get_db_autocommit_session_socket() -> AsyncGenerator[
-    AsyncSession, None
-]:
+async def get_db_autocommit_session_socket() -> (
+    AsyncGenerator[AsyncSession, None]
+):
     """
     Create and get database session.
 
