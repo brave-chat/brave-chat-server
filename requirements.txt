@@ -22,7 +22,7 @@ pydantic==1.10.2
 pydantic[email]==1.10.2
 pyjwt==2.6.0
 pymysql==1.0.2
-python-dotenv==0.21.0
+python-dotenv==1.1.1
 python-multipart==0.0.5
 pyyaml==6.0
 six==1.16.0
